@@ -1,0 +1,3 @@
+; Processed by gcode_path_router.py - Center zone avoidance enabled
+; No-go zone: radius < 650.0mm
+

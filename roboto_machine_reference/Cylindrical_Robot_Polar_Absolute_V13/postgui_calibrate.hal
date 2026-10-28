@@ -1,0 +1,112 @@
+# ============================================================
+# POST-GUI HAL — Dashboard Connections (PYVCP)
+# User requested revert to PyVCP for main config
+# ============================================================
+
+# --- Limit Switch LEDs (simulated — always safe/green) ---
+net j0-min-limit-raw => pyvcp.j0-min
+net j0-max-limit-raw => pyvcp.j0-max
+net j1-min-limit-raw => pyvcp.j1-min
+net j1-max-limit-raw => pyvcp.j1-max
+net j2-min-limit-raw => pyvcp.j2-min
+net j2-max-limit-raw => pyvcp.j2-max
+
+# --- Feed Override Display ---
+setp mult2.0.in1 100.0
+net feed-override halui.feed-override.value => mult2.0.in0
+net feed-override-scaled mult2.0.out => pyvcp.feed-bar
+
+# --- Machine Status LEDs ---
+net prog-running halui.program.is-running => pyvcp.is-running
+net estop-loop => pyvcp.estop-led
+
+# --- Position Display (Text only, no viz) ---
+net x-world-pos axis.x.pos-cmd => pyvcp.pos-x
+net y-world-pos axis.y.pos-cmd => pyvcp.pos-y
+net z-world-pos axis.z.pos-cmd => pyvcp.pos-z
+
+# --- Emergency Axis Override Connections ---
+# Checkbox → AND gate input (in1)
+net j0-override-btn pyvcp.j0-override => and2.0.in1
+net j1-override-btn pyvcp.j1-override => and2.1.in1
+net j2-override-btn pyvcp.j2-override => and2.2.in1
+
+# Enable status LEDs
+net j0-enable-with-override => pyvcp.j0-enable-status
+net j1-enable-with-override => pyvcp.j1-enable-status
+net j2-enable-with-override => pyvcp.j2-enable-status
+
+# --- Home Buttons (calibrate mode keeps Search Home J1 + Home Here J1) ---
+net home-j0-btn  pyvcp.home-j0 => or2.6.in0
+net home-j1-btn  pyvcp.home-j1 => or2.8.in0
+net home-j2-btn  pyvcp.home-j2 => or2.7.in0
+net home-j0-or   or2.6.out => halui.joint.0.home
+net home-j1-or   or2.8.out => halui.joint.1.home
+net home-j2-or   or2.7.out => halui.joint.2.home
+net home-all-btn pyvcp.home-all => halui.home-all
+
+# --- Quick Home J1 (artificial home-switch trigger for in-place homing) ---
+net j1-quick-home-pulse pyvcp.quick-home-j1
+
+# --- Unhome Buttons ---
+net unhome-j0-btn pyvcp.unhome-j0 => or2.3.in0
+net unhome-all-btn pyvcp.unhome-all => or2.3.in1 or2.4.in1 or2.5.in1
+net unhome-j0-combined or2.3.out => halui.joint.0.unhome
+
+net unhome-j1-btn pyvcp.unhome-j1 => or2.4.in0
+net unhome-j1-combined or2.4.out => halui.joint.1.unhome
+
+net unhome-j2-btn pyvcp.unhome-j2 => or2.5.in0
+net unhome-j2-combined or2.5.out => halui.joint.2.unhome
+
+# --- J0 Absolute Calibration Panel ---
+net j0-calibrate-btn pyvcp.j0-calibrate    => j0-cal.calibrate
+net j0-cal-encoder-d j0-cal.cal-encoder    => pyvcp.j0-cal-encoder
+net j0-cal-valid-d   j0-cal.cal-valid      => pyvcp.j0-cal-valid
+net j0-predicted-pos j0-cal.predicted-pos  => pyvcp.j0-predicted-pos
+net j0-encoder-now-d j0-cal.encoder-now    => pyvcp.j0-encoder-now
+
+# --- J1 Absolute Calibration Panel ---
+net j1-calibrate-btn pyvcp.j1-calibrate    => j1-cal.calibrate
+net j1-cal-encoder-d j1-cal.cal-encoder    => pyvcp.j1-cal-encoder
+net j1-cal-valid-d   j1-cal.cal-valid      => pyvcp.j1-cal-valid
+net j1-cal-armed-d   j1-cal.cal-armed      => pyvcp.j1-cal-armed
+net j1-predicted-pos j1-cal.predicted-pos  => pyvcp.j1-predicted-pos
+net j1-encoder-now-d j1-cal.encoder-now    => pyvcp.j1-encoder-now
+
+# --- J2 Absolute Calibration Panel ---
+net j2-calibrate-btn pyvcp.j2-calibrate    => j2-cal.calibrate
+net j2-cal-encoder-d j2-cal.cal-encoder    => pyvcp.j2-cal-encoder
+net j2-cal-valid-d   j2-cal.cal-valid      => pyvcp.j2-cal-valid
+net j2-predicted-pos j2-cal.predicted-pos  => pyvcp.j2-predicted-pos
+net j2-encoder-now-d j2-cal.encoder-now    => pyvcp.j2-encoder-now
+
+# --- Last Saved Position Display ---
+net last-home-j0 pos-saver.j0-last-home => pyvcp.last-home-j0
+net last-home-j1 pos-saver.j1-last-home => pyvcp.last-home-j1
+net last-home-j2 pos-saver.j2-last-home => pyvcp.last-home-j2
+net gcode-line-display pos-saver.gcode-line => pyvcp.gcode-line
+
+# ============================================================
+# AUXILIARY MOTOR PANEL CONTROLS — DIRECT CONTROL (no M64/M65 P4 gate).
+# Slider (0-100) → scale (×0.01) → mux2.in1
+# mux2.sel = panel checkbox (pyvcp.aux-X-on) directly. Checkbox ON starts
+# the motor immediately at slider %; checkbox OFF stops it.
+# motion.digital-out-04 is no longer involved; M64/M65 P4 is unused.
+# mux2.out connected to pwm-ctrl in main HAL.
+# ============================================================
+
+# --- Extruder ---
+net aux-ext-slider pyvcp.aux-ext-speed-f => scale.6.in pyvcp.aux-ext-display
+net aux-ext-scaled scale.6.out           => mux2.3.in1
+net aux-ext-on     pyvcp.aux-ext-on      => mux2.3.sel pyvcp.aux-ext-led
+
+# --- Pump ---
+net aux-pump-slider pyvcp.aux-pump-speed-f => scale.7.in pyvcp.aux-pump-display
+net aux-pump-scaled scale.7.out            => mux2.4.in1
+net aux-pump-on     pyvcp.aux-pump-on      => mux2.4.sel pyvcp.aux-pump-led
+
+# --- Fluid Pump ---
+net aux-fluid-slider pyvcp.aux-fluid-speed-f => scale.8.in pyvcp.aux-fluid-display
+net aux-fluid-scaled scale.8.out             => mux2.5.in1
+net aux-fluid-on     pyvcp.aux-fluid-on      => mux2.5.sel pyvcp.aux-fluid-led

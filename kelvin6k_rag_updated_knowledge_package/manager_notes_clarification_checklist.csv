@@ -1,0 +1,12 @@
+﻿Issue ID,Question for manager/operator,Why clarification is needed,Priority
+K6K-MGR-001,What exactly does 'spray' refer to? What substance and approved method?,Cannot safely infer what is sprayed or how.,High
+K6K-MGR-002,"Does 'clear accelerator pipe' mean inspect, flush, clean, or another task? What safe state/procedure?",Could involve a pressurized/chemical line.,High
+K6K-MGR-003,What is the approved final-layer trimming method and safe machine state?,Tool and timing are not specified.,High
+K6K-MGR-004,Does reinforcement every eight layers apply to all walls or only specific designs?,Could be geometry/design-specific.,High
+K6K-MGR-005,What is the approved hopper cleaning procedure and isolation sequence?,Cleaning can involve pressure and chemical/material hazards.,High
+K6K-MGR-006,Was 'next print in an hour' a one-time schedule or a recurring rule?,Likely time-specific historical note.,Medium
+K6K-MGR-007,"What is the exact E motor, allowed temperature range, and cooldown procedure?",No limits or method supplied.,High
+K6K-MGR-008,"Where and how should temperature be measured, and what limit triggers action?",No threshold or measurement details supplied.,High
+K6K-MGR-010,How often should accelerator level be checked and what is the approved range?,Frequency and threshold absent.,High
+K6K-MGR-011,Where is the authoritative next-wall/print plan recorded?,No wall/job identifier supplied.,Medium
+K6K-MGR-012,What fields must be included in the operator handover?,A formal handover schema would improve reliability.,Medium

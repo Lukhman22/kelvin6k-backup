@@ -1,0 +1,890 @@
+{
+  "document_metadata": {
+    "title": "ATOM Technical Specifications",
+    "organization": "Kelvin6k Robotic & Sustainable Concrete Technology Solutions",
+    "document_type": "Proprietary Technical Specification",
+    "version": "ATOM-V1.0",
+    "extracted_at": "2026-10-15T16:05:00+05:30",
+    "source_images_directory": "docs/knowledge/robot_parts/technical_specs/source_images/",
+    "source_images": [
+      {
+        "filename": "atom_robot_details_table.png",
+        "sections": ["Robot Details", "Performance"],
+        "table_title": "Robot Details & Performance",
+        "description": "Original high-level technical specifications table covering robot details (dimensions, envelope, reach, axes, weight) and performance metrics (repeatability, material, resolution, speeds, precision, nozzle diameters)."
+      },
+      {
+        "filename": "atom_safety_connectivity_table_zoom.png",
+        "sections": ["Safety", "Connectivity", "Warranty & Certification"],
+        "table_title": "Safety, Connectivity, Warranty & Certification",
+        "description": "High-resolution zoomed specification table covering safety systems (dual circuits, e-stops, safety functions, fence, temperature, humidity), connectivity (WiFi, USB, remote support), and warranty/certification standards."
+      }
+    ],
+    "configurations": [
+      {
+        "id": "robot_only",
+        "name": "ATOM – Robot Only",
+        "base_type": "Fixed / Stationary Base",
+        "description": "Fixed pedestal concrete printing robot arm configuration."
+      },
+      {
+        "id": "robot_rover_base",
+        "name": "ATOM – Robot + Rover Base",
+        "base_type": "Autonomous Mobile Rover Base",
+        "description": "Mobile concrete printing robot mounted on an omnidirectional or tracked rover platform."
+      },
+      {
+        "id": "robot_linear_axis",
+        "name": "ATOM – Robot + Linear Axis",
+        "base_type": "Gantry / Track Linear Track Axis",
+        "description": "Concrete printing robot mounted along a 7th external linear track axis for extended build reach."
+      }
+    ]
+  },
+  "sections": [
+    {
+      "section_name": "Robot Details",
+      "source_file": "atom_robot_details_table.png",
+      "parameters": [
+        {
+          "s_no": 1,
+          "parameter_name": "Equipment dimensions (L × W × H) meter",
+          "unit": "meter",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "3 × 0.7 × 3",
+              "length_m": 3.0,
+              "width_m": 0.7,
+              "height_m": 3.0,
+              "unit": "meter",
+              "verification_status": "verified_from_source_table",
+              "notes": "Length 3m, Width 0.7m, Height 3m."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "3 × 1.2 × 3.5",
+              "length_m": 3.0,
+              "width_m": 1.2,
+              "height_m": 3.5,
+              "unit": "meter",
+              "verification_status": "verified_from_source_table",
+              "notes": "Length 3m, Width 1.2m, Height 3.5m. Rover base widens equipment width to 1.2m and increases overall height to 3.5m."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "3 × 0.7 × 3.5",
+              "length_m": 3.0,
+              "width_m": 0.7,
+              "height_m": 3.5,
+              "unit": "meter",
+              "verification_status": "verified_from_source_table",
+              "notes": "Length 3m, Width 0.7m, Height 3.5m. Linear axis mount increases overall height to 3.5m while maintaining narrow 0.7m transport width."
+            }
+          }
+        },
+        {
+          "s_no": 2,
+          "parameter_name": "Build Envelop",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "Circular shape",
+              "envelope_geometry": "circular",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Source spells 'Envelop'. Circular envelope resulting from radial reach of fixed base arm."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "Circular shape",
+              "envelope_geometry": "circular",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Circular envelope around stationary rover position."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "Slot shape",
+              "envelope_geometry": "slot",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Elongated slot / capsule shaped envelope formed by traversing the linear track."
+            }
+          }
+        },
+        {
+          "s_no": 3,
+          "parameter_name": "Build Reach",
+          "unit": "meter (implicit from dimensions and reach spec)",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "5.2 × 3 (diameter × height)",
+              "diameter_m": 5.2,
+              "height_m": 3.0,
+              "reach_geometry": "cylinder",
+              "unit": "meter",
+              "verification_status": "verified_from_source_table",
+              "notes": "Diameter 5.2m × Height 3m cylindrical print zone."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "5.2 × 3 (diameter × height)",
+              "diameter_m": 5.2,
+              "height_m": 3.0,
+              "reach_geometry": "cylinder",
+              "unit": "meter",
+              "verification_status": "verified_from_source_table",
+              "notes": "Diameter 5.2m × Height 3m per printing position."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "2.6 × 2.5 × 3 (slot radius × slot length × height)",
+              "slot_radius_m": 2.6,
+              "slot_length_m": 2.5,
+              "height_m": 3.0,
+              "reach_geometry": "slot_track",
+              "unit": "meter",
+              "verification_status": "verified_from_source_table",
+              "notes": "Slot radius 2.6m, Slot length 2.5m, Height 3m. Total slot diameter is 5.2m (2 × 2.6m radius) extended across 2.5m linear stroke."
+            }
+          }
+        },
+        {
+          "s_no": 4,
+          "parameter_name": "Number of axis",
+          "unit": "axes (count)",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "3",
+              "axis_count": 3,
+              "unit": "axes",
+              "verification_status": "verified_from_source_table",
+              "notes": "3 articulated robot kinematic axes."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "3",
+              "axis_count": 3,
+              "unit": "axes",
+              "verification_status": "verified_from_source_table",
+              "notes": "3 articulated robot kinematic axes on rover base."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "4",
+              "axis_count": 4,
+              "unit": "axes",
+              "verification_status": "verified_from_source_table",
+              "notes": "4 synchronized axes: 3 articulated robot axes plus 1 synchronized linear track axis."
+            }
+          }
+        },
+        {
+          "s_no": 5,
+          "parameter_name": "Printer weight",
+          "unit": "kgs",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "550kgs",
+              "weight_kg": 550,
+              "unit": "kgs",
+              "verification_status": "verified_from_source_table",
+              "notes": "Base robot weight 550 kg."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "700kgs",
+              "weight_kg": 700,
+              "unit": "kgs",
+              "verification_status": "verified_from_source_table",
+              "notes": "Total printer weight 700 kg (robot arm plus rover base)."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "900kgs",
+              "weight_kg": 900,
+              "unit": "kgs",
+              "verification_status": "verified_from_source_table",
+              "notes": "Total printer weight 900 kg (robot arm plus linear rail and track carriage)."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "section_name": "Performance",
+      "source_file": "atom_robot_details_table.png",
+      "parameters": [
+        {
+          "s_no": 1,
+          "parameter_name": "Position repeatability",
+          "unit": "mm",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "0.1mm",
+              "value_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm position repeatability across all configurations."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "0.1mm",
+              "value_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm position repeatability across all configurations."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "0.1mm",
+              "value_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm position repeatability across all configurations."
+            }
+          }
+        },
+        {
+          "s_no": 2,
+          "parameter_name": "Path repeatability",
+          "unit": "mm",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "0.1mm",
+              "value_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm continuous path repeatability."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "0.1mm",
+              "value_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm continuous path repeatability."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "0.1mm",
+              "value_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm continuous path repeatability."
+            }
+          }
+        },
+        {
+          "s_no": 3,
+          "parameter_name": "Print material",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "Kelvicrete",
+              "material": "Kelvicrete",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Proprietary Kelvin6k printable concrete mortar formulation."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "Kelvicrete",
+              "material": "Kelvicrete",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Proprietary Kelvin6k printable concrete mortar formulation."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "Kelvicrete",
+              "material": "Kelvicrete",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Proprietary Kelvin6k printable concrete mortar formulation."
+            }
+          }
+        },
+        {
+          "s_no": 4,
+          "parameter_name": "Layer resolution",
+          "unit": "mm",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "20 - 70 mm",
+              "min_mm": 20,
+              "max_mm": 70,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Layer height range 20 to 70 mm."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "20 - 70 mm",
+              "min_mm": 20,
+              "max_mm": 70,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Layer height range 20 to 70 mm."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "20 - 70 mm",
+              "min_mm": 20,
+              "max_mm": 70,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Layer height range 20 to 70 mm."
+            }
+          }
+        },
+        {
+          "s_no": 5,
+          "parameter_name": "Print speed",
+          "unit": "mm/s",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "upto 200mm/s",
+              "max_speed_mm_s": 200,
+              "unit": "mm/s",
+              "verification_status": "verified_from_source_table",
+              "notes": "Maximum print execution speed up to 200 mm/s."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "upto 200mm/s",
+              "max_speed_mm_s": 200,
+              "unit": "mm/s",
+              "verification_status": "verified_from_source_table",
+              "notes": "Maximum print execution speed up to 200 mm/s."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "upto 200mm/s",
+              "max_speed_mm_s": 200,
+              "unit": "mm/s",
+              "verification_status": "verified_from_source_table",
+              "notes": "Maximum print execution speed up to 200 mm/s."
+            }
+          }
+        },
+        {
+          "s_no": 6,
+          "parameter_name": "Driving speed",
+          "unit": "km/hr",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "-",
+              "value_km_hr": null,
+              "unit": null,
+              "verification_status": "not_applicable",
+              "notes": "Flagged: Listed as '-' because Robot Only is stationary and has no drive base."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "5km/hr",
+              "value_km_hr": 5.0,
+              "unit": "km/hr",
+              "verification_status": "verified_from_source_table",
+              "notes": "Rover base driving speed 5 km/hr."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "5km/hr",
+              "value_km_hr": 5.0,
+              "unit": "km/hr",
+              "verification_status": "verified_from_source_table",
+              "notes": "Linear carriage traversing drive speed 5 km/hr."
+            }
+          }
+        },
+        {
+          "s_no": 7,
+          "parameter_name": "Print precision (X / Y / Z)mm",
+          "unit": "mm",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "0.1/0.1/0.1",
+              "x_precision_mm": 0.1,
+              "y_precision_mm": 0.1,
+              "z_precision_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm precision across all 3 Cartesian axes."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "0.1/0.1/0.1",
+              "x_precision_mm": 0.1,
+              "y_precision_mm": 0.1,
+              "z_precision_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm precision across all 3 Cartesian axes."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "0.1/0.1/0.1",
+              "x_precision_mm": 0.1,
+              "y_precision_mm": 0.1,
+              "z_precision_mm": 0.1,
+              "unit": "mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "0.1 mm precision across all 3 Cartesian axes."
+            }
+          }
+        },
+        {
+          "s_no": 8,
+          "parameter_name": "Nozzle diameter (standard)",
+          "unit": "inch / mm",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "1 inch / 25 mm",
+              "diameter_inch": 1.0,
+              "diameter_mm": 25.0,
+              "unit": "inch / mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Standard default nozzle size 1 inch (25 mm)."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "1 inch / 25 mm",
+              "diameter_inch": 1.0,
+              "diameter_mm": 25.0,
+              "unit": "inch / mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Standard default nozzle size 1 inch (25 mm)."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "1 inch / 25 mm",
+              "diameter_inch": 1.0,
+              "diameter_mm": 25.0,
+              "unit": "inch / mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Standard default nozzle size 1 inch (25 mm)."
+            }
+          }
+        },
+        {
+          "s_no": 9,
+          "parameter_name": "Nozzle diameter (optional)",
+          "unit": "inch / mm",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "0.75 inch / 20 mm",
+              "diameter_inch": 0.75,
+              "diameter_mm": 20.0,
+              "unit": "inch / mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Optional high-detail nozzle size 0.75 inch (20 mm)."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "0.75 inch / 20 mm",
+              "diameter_inch": 0.75,
+              "diameter_mm": 20.0,
+              "unit": "inch / mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Optional high-detail nozzle size 0.75 inch (20 mm)."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "0.75 inch / 20 mm",
+              "diameter_inch": 0.75,
+              "diameter_mm": 20.0,
+              "unit": "inch / mm",
+              "verification_status": "verified_from_source_table",
+              "notes": "Optional high-detail nozzle size 0.75 inch (20 mm)."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "section_name": "Safety",
+      "source_file": "atom_safety_connectivity_table_zoom.png",
+      "parameters": [
+        {
+          "s_no": 1,
+          "parameter_name": "Double circuits with supervision",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Dual safety channel supervision supported."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Dual safety channel supervision supported."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Dual safety channel supervision supported."
+            }
+          }
+        },
+        {
+          "s_no": 2,
+          "parameter_name": "Emergency stops",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Hardwired e-stop circuit installed."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Hardwired e-stop circuit installed."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Hardwired e-stop circuit installed."
+            }
+          }
+        },
+        {
+          "s_no": 3,
+          "parameter_name": "Safety functions",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Integrated safety functions (monitoring, interlocks)."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Integrated safety functions (monitoring, interlocks)."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Integrated safety functions (monitoring, interlocks)."
+            }
+          }
+        },
+        {
+          "s_no": 4,
+          "parameter_name": "Safety fence",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "Optional",
+              "status": "Optional",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Safety fence is Optional for Robot Only; required/yes for Rover Base and Linear Axis."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "status": "yes",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Safety fence is standard/required due to mobile rover base perimeter safety."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "status": "yes",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Safety fence is standard/required due to 2.5m traversing track zone safety."
+            }
+          }
+        },
+        {
+          "s_no": 5,
+          "parameter_name": "Environment temperature (celsius)",
+          "unit": "celsius",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "0 to 50",
+              "min_temp_c": 0,
+              "max_temp_c": 50,
+              "unit": "celsius",
+              "verification_status": "verified_from_source_table",
+              "notes": "Operating temperature range 0°C to 50°C."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "0 to 50",
+              "min_temp_c": 0,
+              "max_temp_c": 50,
+              "unit": "celsius",
+              "verification_status": "verified_from_source_table",
+              "notes": "Operating temperature range 0°C to 50°C."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "0 to 50",
+              "min_temp_c": 0,
+              "max_temp_c": 50,
+              "unit": "celsius",
+              "verification_status": "verified_from_source_table",
+              "notes": "Operating temperature range 0°C to 50°C."
+            }
+          }
+        },
+        {
+          "s_no": 6,
+          "parameter_name": "Humidity (non-condensive)",
+          "unit": "%",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "95%",
+              "max_humidity_percent": 95,
+              "unit": "%",
+              "verification_status": "verified_from_source_table",
+              "notes": "Maximum non-condensing relative humidity 95%. Source text writes 'non-condensive'."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "95%",
+              "max_humidity_percent": 95,
+              "unit": "%",
+              "verification_status": "verified_from_source_table",
+              "notes": "Maximum non-condensing relative humidity 95%. Source text writes 'non-condensive'."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "95%",
+              "max_humidity_percent": 95,
+              "unit": "%",
+              "verification_status": "verified_from_source_table",
+              "notes": "Maximum non-condensing relative humidity 95%. Source text writes 'non-condensive'."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "section_name": "Connectivity",
+      "source_file": "atom_safety_connectivity_table_zoom.png",
+      "parameters": [
+        {
+          "s_no": 1,
+          "parameter_name": "WiFi required for service",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "optional",
+              "status": "optional",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "WiFi is optional for Robot Only (can operate fully offline or over USB/wired Ethernet)."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "status": "yes",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "WiFi required for service coordination on Rover Base."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "status": "yes",
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "WiFi required for service coordination on Linear Axis."
+            }
+          }
+        },
+        {
+          "s_no": 2,
+          "parameter_name": "Stand-alone USB printing",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Direct USB stick print execution without active network."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Direct USB stick print execution without active network."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Direct USB stick print execution without active network."
+            }
+          }
+        },
+        {
+          "s_no": 3,
+          "parameter_name": "Remote support",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Remote diagnostic telemetry and engineering support enabled."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Remote diagnostic telemetry and engineering support enabled."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "supported": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Remote diagnostic telemetry and engineering support enabled."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "section_name": "Warranty & Certification",
+      "source_file": "atom_safety_connectivity_table_zoom.png",
+      "parameters": [
+        {
+          "s_no": 1,
+          "parameter_name": "Warranty",
+          "unit": "months",
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "12 months",
+              "duration_months": 12,
+              "unit": "months",
+              "verification_status": "verified_from_source_table",
+              "notes": "Standard OEM manufacturer warranty duration 12 months."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "12 months",
+              "duration_months": 12,
+              "unit": "months",
+              "verification_status": "verified_from_source_table",
+              "notes": "Standard OEM manufacturer warranty duration 12 months."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "12 months",
+              "duration_months": 12,
+              "unit": "months",
+              "verification_status": "verified_from_source_table",
+              "notes": "Standard OEM manufacturer warranty duration 12 months."
+            }
+          }
+        },
+        {
+          "s_no": 2,
+          "parameter_name": "Certifications",
+          "unit": null,
+          "configurations": {
+            "ATOM – Robot Only": {
+              "original_wording": "yes",
+              "certified": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Industry certified compliance."
+            },
+            "ATOM – Robot + Rover Base": {
+              "original_wording": "yes",
+              "certified": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Industry certified compliance."
+            },
+            "ATOM – Robot + Linear Axis": {
+              "original_wording": "yes",
+              "certified": true,
+              "unit": null,
+              "verification_status": "verified_from_source_table",
+              "notes": "Industry certified compliance."
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "configuration_summaries": {
+    "ATOM – Robot Only": {
+      "dimensions": "3 × 0.7 × 3 meter (Length: 3m, Width: 0.7m, Height: 3m)",
+      "build_envelope": "Circular shape",
+      "build_reach": "5.2 × 3 (diameter × height) in meters",
+      "axes": 3,
+      "printer_weight": "550kgs",
+      "position_repeatability": "0.1mm",
+      "path_repeatability": "0.1mm",
+      "print_material": "Kelvicrete",
+      "layer_resolution": "20 - 70 mm",
+      "print_speed": "upto 200mm/s",
+      "driving_speed": "- (stationary / not applicable)",
+      "print_precision_xyz": "0.1/0.1/0.1 mm",
+      "nozzle_standard": "1 inch / 25 mm",
+      "nozzle_optional": "0.75 inch / 20 mm",
+      "double_circuits_with_supervision": "yes",
+      "emergency_stops": "yes",
+      "safety_functions": "yes",
+      "safety_fence": "Optional",
+      "environment_temperature": "0 to 50 celsius",
+      "humidity_non_condensive": "95%",
+      "wifi_required_for_service": "optional",
+      "standalone_usb_printing": "yes",
+      "remote_support": "yes",
+      "warranty": "12 months",
+      "certifications": "yes"
+    },
+    "ATOM – Robot + Rover Base": {
+      "dimensions": "3 × 1.2 × 3.5 meter (Length: 3m, Width: 1.2m, Height: 3.5m)",
+      "build_envelope": "Circular shape",
+      "build_reach": "5.2 × 3 (diameter × height) in meters",
+      "axes": 3,
+      "printer_weight": "700kgs",
+      "position_repeatability": "0.1mm",
+      "path_repeatability": "0.1mm",
+      "print_material": "Kelvicrete",
+      "layer_resolution": "20 - 70 mm",
+      "print_speed": "upto 200mm/s",
+      "driving_speed": "5km/hr",
+      "print_precision_xyz": "0.1/0.1/0.1 mm",
+      "nozzle_standard": "1 inch / 25 mm",
+      "nozzle_optional": "0.75 inch / 20 mm",
+      "double_circuits_with_supervision": "yes",
+      "emergency_stops": "yes",
+      "safety_functions": "yes",
+      "safety_fence": "yes",
+      "environment_temperature": "0 to 50 celsius",
+      "humidity_non_condensive": "95%",
+      "wifi_required_for_service": "yes",
+      "standalone_usb_printing": "yes",
+      "remote_support": "yes",
+      "warranty": "12 months",
+      "certifications": "yes"
+    },
+    "ATOM – Robot + Linear Axis": {
+      "dimensions": "3 × 0.7 × 3.5 meter (Length: 3m, Width: 0.7m, Height: 3.5m)",
+      "build_envelope": "Slot shape",
+      "build_reach": "2.6 × 2.5 × 3 (slot radius × slot length × height) in meters",
+      "axes": 4,
+      "printer_weight": "900kgs",
+      "position_repeatability": "0.1mm",
+      "path_repeatability": "0.1mm",
+      "print_material": "Kelvicrete",
+      "layer_resolution": "20 - 70 mm",
+      "print_speed": "upto 200mm/s",
+      "driving_speed": "5km/hr",
+      "print_precision_xyz": "0.1/0.1/0.1 mm",
+      "nozzle_standard": "1 inch / 25 mm",
+      "nozzle_optional": "0.75 inch / 20 mm",
+      "double_circuits_with_supervision": "yes",
+      "emergency_stops": "yes",
+      "safety_functions": "yes",
+      "safety_fence": "yes",
+      "environment_temperature": "0 to 50 celsius",
+      "humidity_non_condensive": "95%",
+      "wifi_required_for_service": "yes",
+      "standalone_usb_printing": "yes",
+      "remote_support": "yes",
+      "warranty": "12 months",
+      "certifications": "yes"
+    }
+  }
+}

@@ -1,0 +1,170 @@
+# ============================================================
+# POST-GUI HAL — QtDragon variant
+# Companion to cylindrical_robot_qtdragon.ini.
+#
+# The original postgui.hal wires PyVCP panel widgets that don't
+# exist here (we chose to drop the panel for the QtDragon switch).
+# Its critical side-effect, however, is feeding the override
+# checkboxes (and2.0/1/2.in1) — without that, every joint enable
+# is gated to 0 and the drives never come up. Force those to 1
+# here so the machine actually moves.
+#
+# Aux-motor sliders/checkboxes are wired DIRECTLY (no M64/M65
+# master gate): checkbox ON starts the motor immediately at
+# slider %; checkbox OFF stops it. See aux block at bottom.
+# ============================================================
+
+# Emergency Axis Override — backend ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). Each checkbox is
+# the second input of and2.0/1/2; the first input is joint.N.amp-enable-out
+# (wired in main HAL). Ticked = drive enabled. Unticked = drive forced
+# disabled regardless of motion-controller state. Handler defaults the
+# 3 qtdragon.jN-override pins to True so boot behaviour matches the old
+# 'setp and2.N.in1 1' force-on.
+net j0-override-btn qtdragon.j0-override => and2.0.in1
+net j1-override-btn qtdragon.j1-override => and2.1.in1
+net j2-override-btn qtdragon.j2-override => and2.2.in1
+
+# Drive-enable LEDs read the and2 outputs (= active cia402.enableN).
+# j{0,1,2}-enable-with-override signals already exist in main HAL.
+net j0-enable-with-override => qtdragon.led-j0-enabled
+net j1-enable-with-override => qtdragon.led-j1-enabled
+net j2-enable-with-override => qtdragon.led-j2-enabled
+
+# Limit Switch Status — backend ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). Source signals
+# j{0,1,2}-{min,max}-limit-raw are created in cylindrical_robot.hal
+# via bitslice on EtherCAT digital inputs (DI2 = min/home, DI3 = max).
+# LED ON (red) = limit tripped. LED OFF (green) = safe.
+net j0-min-limit-raw => qtdragon.lim-j0-min
+net j0-max-limit-raw => qtdragon.lim-j0-max
+net j1-min-limit-raw => qtdragon.lim-j1-min
+net j1-max-limit-raw => qtdragon.lim-j1-max
+net j2-min-limit-raw => qtdragon.lim-j2-min
+net j2-max-limit-raw => qtdragon.lim-j2-max
+
+# Machine Status LEDs — backend ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). is-running follows
+# halui.program.is-running. estop-led follows the estop-loop signal
+# (the active enable, gated by drives-ready in production).
+net prog-running halui.program.is-running => qtdragon.is-running
+net estop-loop                              => qtdragon.estop-led
+
+# Tool Position (Cartesian) — backend ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). x-world-pos and
+# y-world-pos signals already exist in cylindrical_robot.hal (sourced
+# by axis.{x,y}.pos-cmd, feeding polar_viz); we extend them with the
+# panel destinations. z-world-pos is created fresh here.
+net x-world-pos axis.x.pos-cmd => qtdragon.pos-x
+net y-world-pos axis.y.pos-cmd => qtdragon.pos-y
+net z-world-pos axis.z.pos-cmd => qtdragon.pos-z
+
+# Per-joint Home/Unhome are handled by the DRO's built-in btn_home_x/y/z
+# toggle (calls ACTION.SET_MACHINE_HOMING directly via btn_home_clicked
+# handler). Home All / Unhome All buttons in OFFSETS panel also use
+# ACTION directly. So there are no qtdragon.home-* / unhome-* HAL pins
+# to net here.
+
+# Auto-home on machine-on — Feature 7, ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). abs-home userspace
+# comp is loaded in cylindrical_robot.hal. Rising edge of
+# halui.machine.is-on triggers an encoder read + INI patch +
+# halui.home-all pulse. All joints have HOME_SEARCH_VEL=0 so they
+# home-in-place to the computed offset.
+net machine-is-on   halui.machine.is-on    => abs-home.machine-on
+net auto-home-pulse abs-home.trigger-home  => halui.home-all
+
+# Last-saved-position display — backend ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). pos-saver userspace
+# comp is loaded in cylindrical_robot.hal and already fed live joint
+# positions + homed flags. Here we just net its 4 outputs to the
+# qtvcp HAL_Label widgets (hallbl_lastpos_j0/1/2/line).
+net last-home-j0      pos-saver.j0-last-home => qtdragon.lastpos-j0
+net last-home-j1      pos-saver.j1-last-home => qtdragon.lastpos-j1
+net last-home-j2      pos-saver.j2-last-home => qtdragon.lastpos-j2
+net gcode-line-display pos-saver.gcode-line  => qtdragon.lastpos-line
+
+# PRINT HEAD gauge — feedrate source moved to STATUS 'current-feed-rate'
+# subscription in handler.py (same data source as SPEEDS/CURRENT FEEDRATE).
+# No HAL net needed here.
+
+# JOINTS panel — live current joint position display (in addition to
+# Last J0/J1/J2). On production HW, signals angle-pos-fb / radius-pos-fb /
+# z-pos-fb already exist in main HAL (sourced by the EtherCAT feedback
+# scale chain). On sim, add the qtdragon.* destination separately to
+# joint.N.motor-pos-cmd via cylindrical_robot_sim.hal if you want sim
+# preview.
+net angle-pos-fb  => qtdragon.nowpos-j0
+net radius-pos-fb => qtdragon.nowpos-j1
+net z-pos-fb      => qtdragon.nowpos-j2
+
+# === CALIBRATE tab — wires QtDragon UI to the existing j0/j1_calibrate.py
+# userspace HAL components (loaded in cylindrical_robot.hal).
+# Button click → QtDragon writes qtdragon.cal-jN → nets to j0/j1-cal.calibrate
+# trigger pin (200 ms pulse, see handler).
+net j0-calibrate-btn qtdragon.cal-j0       => j0-cal.calibrate
+net j1-calibrate-btn qtdragon.cal-j1       => j1-cal.calibrate
+net j2-calibrate-btn qtdragon.cal-j2       => j2-cal.calibrate
+# Helper output pins → UI HALLabel/LED widgets
+# Signal names mirror postgui_calibrate.hal (AXIS) for cross-config consistency.
+net j0-cal-valid-d   j0-cal.cal-valid     => qtdragon.led-cal-j0-valid
+net j0-cal-encoder-d j0-cal.cal-encoder   => qtdragon.cal-j0-enc
+net j0-encoder-now-d j0-cal.encoder-now   => qtdragon.cal-j0-enc-now
+net j0-predicted-pos j0-cal.predicted-pos => qtdragon.cal-j0-pred
+net j1-cal-valid-d   j1-cal.cal-valid     => qtdragon.led-cal-j1-valid
+net j1-cal-armed-d   j1-cal.cal-armed     => qtdragon.led-cal-j1-armed
+net j1-cal-encoder-d j1-cal.cal-encoder   => qtdragon.cal-j1-enc
+net j1-encoder-now-d j1-cal.encoder-now   => qtdragon.cal-j1-enc-now
+net j1-predicted-pos j1-cal.predicted-pos => qtdragon.cal-j1-pred
+net j2-cal-valid-d   j2-cal.cal-valid     => qtdragon.led-cal-j2-valid
+net j2-cal-encoder-d j2-cal.cal-encoder   => qtdragon.cal-j2-enc
+net j2-encoder-now-d j2-cal.encoder-now   => qtdragon.cal-j2-enc-now
+net j2-predicted-pos j2-cal.predicted-pos => qtdragon.cal-j2-pred
+
+# =====================================================================
+# Auxiliary Motor Control — DIRECT CONTROL (no M64/M65 P4 master gate).
+# Checkbox ON  -> motor starts immediately at slider %.
+# Checkbox OFF -> motor stops immediately.
+#
+# Topology:
+#   slider (0..100)  -> qtdragon.aux-X-speed-f -> scale.N.in (gain 0.01)
+#                                            \-> qtdragon.aux-X-display
+#                                                  scale.N.out -> mux2.N.in1
+#   checkbox         -> qtdragon.aux-X-on      -> mux2.N.sel
+#                                            \-> qtdragon.aux-X-led
+#   mux2.N.out       -> pwm-ctrl.<channel>  (pre-wired in main HAL)
+#
+# The and2.{3,4,5} components remain loaded but unused — their outputs
+# are no longer wired. motion.digital-out-04 is left free for other use.
+# =====================================================================
+
+# --- Extruder ---
+net aux-ext-slider qtdragon.aux-ext-speed-f => scale.6.in qtdragon.aux-ext-display
+net aux-ext-scaled scale.6.out              => mux2.3.in1
+net aux-ext-on     qtdragon.aux-ext-on      => mux2.3.sel qtdragon.aux-ext-led
+
+# --- Pump ---
+net aux-pump-slider qtdragon.aux-pump-speed-f => scale.7.in qtdragon.aux-pump-display
+net aux-pump-scaled scale.7.out               => mux2.4.in1
+net aux-pump-on     qtdragon.aux-pump-on      => mux2.4.sel qtdragon.aux-pump-led
+
+# --- Fluid Pump ---
+net aux-fluid-slider qtdragon.aux-fluid-speed-f => scale.8.in qtdragon.aux-fluid-display
+net aux-fluid-scaled scale.8.out                => mux2.5.in1
+net aux-fluid-on     qtdragon.aux-fluid-on      => mux2.5.sel qtdragon.aux-fluid-led
+
+# =====================================================================
+# J1 jog-speed slider — pin exported by qtdragon_hd_handler.py
+# (_apply_j0_j1_j2_jog_logic). The pin currently has no sink: LinuxCNC's
+# halui exposes ONLY global jog-speed pins (halui.joint.jog-speed,
+# halui.axis.jog-speed), not per-joint ones (halui.joint.N.jog-speed does
+# not exist). A future change can route this pin through a mux2 gated by
+# halui.joint.1.is-selected into the global halui.joint.jog-speed pin.
+# =====================================================================
+
+# halui home buttons in QtDragon talk to halui.joint.N.home
+# directly, so no extra wiring is needed for homing.
+
+# Estop loop, limit switches, position-saver/visualizer/calibrate
+# helpers are all wired in cylindrical_robot.hal — nothing to
+# duplicate here.

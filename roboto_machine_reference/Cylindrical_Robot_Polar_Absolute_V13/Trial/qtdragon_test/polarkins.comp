@@ -1,0 +1,73 @@
+component polarkins "Polar Kinematics for 2-axis polar robot";
+
+description """
+Polar Kinematics: Converts Cartesian X,Y to polar angle,radius
+World: X, Y (mm) -> Joints: angle (deg), radius (mm)
+""";
+
+license "GPL";
+author "LinuxCNC Polar Robot";
+
+pin in float min_radius = 650.0 "Minimum radius to avoid singularity";
+
+FUNCTION kinematicsType;
+FUNCTION kinematicsForward;
+FUNCTION kinematicsInverse;
+
+;;
+
+#include "kinematics.h"
+#include "rtapi_math.h"
+
+EXPORT_SYMBOL(kinematicsType);
+EXPORT_SYMBOL(kinematicsForward);
+EXPORT_SYMBOL(kinematicsInverse);
+
+KINEMATICS_TYPE kinematicsType(void) {
+    return KINEMATICS_BOTH;
+}
+
+int kinematicsForward(const double *joints,
+                      EmcPose *pos,
+                      const KINEMATICS_FORWARD_FLAGS *fflags,
+                      KINEMATICS_INVERSE_FLAGS *iflags) {
+    
+    double angle_rad = joints[0] * (M_PI / 180.0);
+    double radius = joints[1];
+    
+    pos->tran.x = radius * cos(angle_rad);
+    pos->tran.y = radius * sin(angle_rad);
+    pos->tran.z = 0;
+    pos->a = 0;
+    pos->b = 0;
+    pos->c = 0;
+    pos->u = 0;
+    pos->v = 0;
+    pos->w = 0;
+    
+    return 0;
+}
+
+int kinematicsInverse(const EmcPose *pos,
+                      double *joints,
+                      const KINEMATICS_INVERSE_FLAGS *iflags,
+                      KINEMATICS_FORWARD_FLAGS *fflags) {
+    
+    double x = pos->tran.x;
+    double y = pos->tran.y;
+    double min_r = min_radius;
+    
+    if (min_r < 1.0) min_r = 650.0;
+    
+    double radius = sqrt(x*x + y*y);
+    if (radius < min_r) radius = min_r;
+    
+    double angle_deg = atan2(y, x) * (180.0 / M_PI);
+    while (angle_deg < 0) angle_deg += 360.0;
+    while (angle_deg >= 360.0) angle_deg -= 360.0;
+    
+    joints[0] = angle_deg;
+    joints[1] = radius;
+    
+    return 0;
+}

@@ -1,0 +1,32 @@
+﻿Topic,Conflict_or_question,Required_confirmation,Priority
+CLEANING,Cleaning every 3-4 hours vs after each wall vs after 1 hour idle,Confirm exact mandatory conditions and whether intervals are cumulative.,High
+HARDENING,5-minute hopper hardening vs 15-20-minute material setting,"Clarify material/accelerator, location, temperature, and conditions.",High
+LAYER THICKNESS,40-45 mm vs 40-50 mm,Confirm approved thickness per print geometry/job.,High
+MEASUREMENT CADENCE,"First layer/1-2 layers, then 10-15 vs 10-20 layers",Confirm approved inspection frequency.,Medium
+GREEN STRENGTH,3-4 subsequent layers vs fifth-layer stop vs 10th-12th layer failure,Clarify correct objective threshold and conditions.,High
+FEEDRATE,100/150/170 straight and 100-120 curved,"Confirm scale, units, approved ranges, and robot/job context.",High
+FLOW BLOCKAGE,Hammering/pushing pump and rapid feedrate pulsing,Engineer to confirm or reject; do not publish as recommended procedure until approved.,High
+PAUSE PROCEDURE,Extrude every 2-3 minutes during pause,Confirm approved pause procedure; no autonomous actuation.,High
+E136.1,Encoder cable damage,Verify code against exact manufacturer manual and inspection.,High
+E137.1,Servo/robot position mismatch and encoder reset,Verify alarm and authorized recovery sequence; no generic reset instruction.,High
+H0D11,Z-axis travel limit/manual downward jog,Verify parameter definition and safety procedure; no generic parameter change.,High
+50% HARDNESS,Meaning of 50% hardness,Define test method and pass/fail threshold.,High
+ENVIRONMENTAL NOTEBOOK,10-15 days of readings every 2-3 hours,"Collect notebook; validate units, timestamps, missing values, job IDs, source.",Medium
+VISION LIGHTING,No false stops from shadows/lighting reported,"Treat as operator observation, not proof; compare with logs and varied conditions.",Medium
+Accelerator nozzle clogging,Premature setting/clogging is reported,"Confirm exact mix, accelerator, conditions, and approved clearing procedure.",High
+Hopper and hose blockages,Recurring blockages reported,"Record conditions, blockage location, pressure state, cleaning history, and verified remedy.",High
+Accelerator pump pressure,Pressure drops after several days; dosing effect described as likely,"Collect measured pressure, pump model, logs, and dosing evidence.",High
+Wet material,Thin layers and collapse risk reported,Define measurable material consistency range and verify relationship.,High
+Dry material,Thick/cracked layers and pump air intake reported,Define measurable consistency range and verify pump symptoms.,High
+Weather and temperature,Environmental effects reported without thresholds,Correlate logged environmental data with specific print outcomes.,Medium
+E-motor overheating,No readings or limits supplied,Identify motor and confirm manufacturer temperature limits and procedure.,High
+E-mixer loosening/bearing,Mechanical issue reported,Inspect assembly and document verified failure and repair.,High
+Pump VFD faults,No VFD code/model supplied,"Capture exact model, fault code, logs, and approved recovery procedure.",High
+Servo E-731,Code meaning unverified,Verify against exact drive manufacturer/model manual.,High
+EtherCAT communication,Cable association reported but not confirmed,"Review topology, link status, node logs, and physical inspection.",High
+ESP-32 errors,No symptom/log details supplied,"Collect firmware version, logs, reset behavior, and reproduction steps.",Medium
+USB connection failures,No device or logs supplied,Test cable/port and record observed error messages.,Medium
+Wiring shorts,Safety-critical category reported,Qualified technician to inspect under approved electrical safety procedure.,High
+V1 calibration/alignment,"Y-axis, Z-height, general calibration and alignment categories reported",Split into cases and document approved calibration values/procedure.,High
+G-code issues,No sample or exact behavior supplied,"Compare G-code, expected/actual path, software versions, and simulation result.",High
+V2 jerking/vibration,Vibration and bead tearing reported without root cause,"Capture affected paths, axis/drive logs, settings, and exact configuration.",High

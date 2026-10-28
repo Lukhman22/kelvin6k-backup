@@ -1,0 +1,12 @@
+--- QtVCP Screen Started on: Tue, Jul 21 2026 15:01:28 ---
+Tue21 15:01: File Manager error - No such path: /home/anshul/linuxcnc/nc_files
+Tue21 15:01: File Manager error - No such path: /home/anshul/linuxcnc/nc_files
+--- QtDragon_hd Version 1.5 on Linuxcnc 2.9.10 ---
+Tue21 15:01: Machine OFF
+Tue21 15:01: Hard limits tripped
+Tue21 15:01: Unexpected realtime delay on task 0 with period 1000000
+This Message will only display once per session.
+Run the Latency Test and resolve before continuing.
+Tue21 15:01: Machine ON
+AUTO-RESUME: no saved file.
+Auto-issued G92.1 — G92 offsets cleared.

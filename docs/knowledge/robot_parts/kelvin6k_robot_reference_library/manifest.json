@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "library_id": "kelvin6k_robot_reference_library_initial",
+  "library_title": "Kelvin6K Robot Whole-Machine Visual References",
+  "purpose": "Initial user-provided visual reference collection for Kelvin6K robot overview and product appearance. Not a verified component-level engineering manual.",
+  "default_verification_status": "UNVERIFIED",
+  "assets": [
+    {
+      "asset_id": "K6K-REF-001",
+      "component_name": "outdoor_gantry_robot",
+      "file": "images/K6K-REF-001-outdoor-gantry-robot.png",
+      "asset_role": "robot_reference",
+      "image_category": "robot_reference",
+      "display_title": "Outdoor robot / raised gantry overview",
+      "visible_observations": [
+        "A large outdoor robotic/construction machine with a raised horizontal arm or beam",
+        "A tall vertical structural member is visible on the left side",
+        "Hoses or cables are visible around the central support area"
+      ],
+      "verified_component_ids": [],
+      "hardware_version": null,
+      "technical_specifications_verified": false,
+      "verification_status": "UNVERIFIED",
+      "source_provenance": "Image supplied by the user in the ChatGPT conversation; original publication/source not verified",
+      "limitations": "Whole-machine overview only. Do not infer exact wiring, part numbers, dimensions, controller model, or confirmed fault locations."
+    },
+    {
+      "asset_id": "K6K-REF-002",
+      "component_name": "rover_base_robot",
+      "file": "images/K6K-REF-002-mobile-concrete-printing-robot.png",
+      "asset_role": "robot_reference",
+      "image_category": "robot_reference",
+      "display_title": "Mobile concrete-printing robot in an indoor work area",
+      "visible_observations": [
+        "A wheeled mobile platform is visible",
+        "A vertical mast and horizontal printing arm are visible",
+        "Printed concrete objects are visible in front of the machine"
+      ],
+      "verified_component_ids": [],
+      "hardware_version": null,
+      "technical_specifications_verified": false,
+      "verification_status": "UNVERIFIED",
+      "source_provenance": "Image supplied by the user in the ChatGPT conversation; original publication/source not verified",
+      "limitations": "Whole-machine and printing-scene reference only. Individual electronics and internal components cannot be identified reliably from this view."
+    },
+    {
+      "asset_id": "K6K-REF-003",
+      "component_name": "exhibition_robot",
+      "file": "images/K6K-REF-003-exhibition-robot-side-view.png",
+      "asset_role": "robot_reference",
+      "image_category": "robot_reference",
+      "display_title": "Mobile robot displayed at an exhibition",
+      "visible_observations": [
+        "A wheeled base is visible",
+        "A vertical mast and horizontal arm are visible",
+        "External branding and an exhibition setting are visible"
+      ],
+      "verified_component_ids": [],
+      "hardware_version": null,
+      "technical_specifications_verified": false,
+      "verification_status": "UNVERIFIED",
+      "source_provenance": "Image supplied by the user in the ChatGPT conversation; original publication/source not verified",
+      "limitations": "Product/exhibition overview only. Branding or appearance does not establish hardware version or technical specifications."
+    },
+    {
+      "asset_id": "K6K-REF-004",
+      "component_name": "website_hero_robot",
+      "file": "images/K6K-REF-004-website-hero-robot.png",
+      "asset_role": "robot_reference",
+      "image_category": "robot_reference",
+      "display_title": "Website hero visual showing a robot product",
+      "visible_observations": [
+        "A product-style visual of a wheeled robot with a vertical mast and horizontal arm",
+        "Website heading text is visible in the supplied image"
+      ],
+      "verified_component_ids": [],
+      "hardware_version": null,
+      "technical_specifications_verified": false,
+      "verification_status": "UNVERIFIED",
+      "source_provenance": "Image supplied by the user in the ChatGPT conversation; original webpage URL and publication date not verified",
+      "limitations": "Marketing/website visual. Do not use it as a technical diagram, wiring reference, or proof of internal component configuration."
+    }
+  ]
+}

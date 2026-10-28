@@ -1,0 +1,86 @@
+component polarkins3d "Polar Kinematics for 3-axis cylindrical 3D printer";
+
+description "Converts Cartesian X,Y,Z to polar angle,radius,height";
+
+license "GPL";
+author "LinuxCNC Polar Robot";
+
+pin out float dummy = 0.0 "Unused - required by halcompile";
+
+;;
+
+#include "kinematics.h"
+#include "rtapi_math.h"
+
+/* Hardcoded parameters - matches JOINT_1 MIN_LIMIT in INI */
+#define MIN_RADIUS 650.0
+
+/* Perpendicular tool offset (mm). Tool tip sits this far sideways from the
+ * radius-arm centerline; negative = right/clockwise of the arm direction.
+ * Replaces the gcode_validator.py pre-compensation so G-code can target
+ * tool-tip cartesian coordinates directly. */
+#define TOOL_OFFSET -235.0
+
+EXPORT_SYMBOL(kinematicsType);
+EXPORT_SYMBOL(kinematicsForward);
+EXPORT_SYMBOL(kinematicsInverse);
+
+KINS_NOT_SWITCHABLE;
+
+KINEMATICS_TYPE kinematicsType(void) {
+    return KINEMATICS_BOTH;
+}
+
+int kinematicsForward(const double *joints,
+                      EmcPose *pos,
+                      const KINEMATICS_FORWARD_FLAGS *fflags,
+                      KINEMATICS_INVERSE_FLAGS *iflags) {
+
+    double angle_rad = joints[0] * (M_PI / 180.0);
+    double radius = joints[1];
+    double ca = cos(angle_rad);
+    double sa = sin(angle_rad);
+
+    pos->tran.x = radius * ca - TOOL_OFFSET * sa;
+    pos->tran.y = radius * sa + TOOL_OFFSET * ca;
+    pos->tran.z = joints[2];
+    pos->a = 0;
+    pos->b = 0;
+    pos->c = 0;
+    pos->u = 0;
+    pos->v = 0;
+    pos->w = 0;
+
+    return 0;
+}
+
+int kinematicsInverse(const EmcPose *pos,
+                      double *joints,
+                      const KINEMATICS_INVERSE_FLAGS *iflags,
+                      KINEMATICS_FORWARD_FLAGS *fflags) {
+
+    double x = pos->tran.x;
+    double y = pos->tran.y;
+
+    /* d² = r² + offset²  →  r = sqrt(d² - offset²) */
+    double d_squared = x*x + y*y;
+    double r_squared = d_squared - TOOL_OFFSET * TOOL_OFFSET;
+    if (r_squared < 0) r_squared = 0;
+    double radius = sqrt(r_squared);
+    if (radius < MIN_RADIUS) radius = MIN_RADIUS;
+
+    /* Arm angle = direction-to-target minus the offset-induced lead angle.
+     * Use atan2 natural range -180..180 — do NOT wrap to 0..360.
+     * Wrapping caused negative-Y targets (e.g. -10 deg) to become 350 deg,
+     * forcing a ~350 deg rotation from home instead of a short -10 deg move.
+     * JOINT_0 limits are -360..360 so negative angles are fully supported. */
+    double base_angle = atan2(y, x);
+    double offset_angle = atan2(TOOL_OFFSET, radius);
+    double angle_deg = (base_angle - offset_angle) * (180.0 / M_PI);
+
+    joints[0] = angle_deg;
+    joints[1] = radius;
+    joints[2] = pos->tran.z;
+
+    return 0;
+}

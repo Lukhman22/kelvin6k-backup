@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="2.24"/>
+  <requires lib="gladevcp" version="1.0"/>
+  <!-- Top-level window is NOT used by AXIS, but required for Glade editor -->
+  <object class="GtkWindow" id="window1">
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkVBox" id="vbox1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="spacing">5</property>
+        <property name="border_width">5</property>
+
+        <!-- TITLE -->
+        <child>
+          <object class="GtkLabel" id="label_title">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">MACHINE DASHBOARD</property>
+            <attributes>
+              <attribute name="weight" value="bold"/>
+              <attribute name="scale" value="1.4"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="padding">5</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+
+        <!-- VISUALIZER AREA (Top for better visibility) -->
+        <child>
+            <object class="GtkFrame" id="frame_viz">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0</property>
+                <property name="shadow_type">etched-out</property>
+                <child>
+                    <object class="GtkDrawingArea" id="polar_viz">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="height_request">300</property>
+                    </object>
+                </child>
+                <child type="label">
+                    <object class="GtkLabel" id="label_viz">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Live Polar Visualizer</property>
+                        <attributes>
+                            <attribute name="weight" value="bold"/>
+                        </attributes>
+                    </object>
+                </child>
+            </object>
+            <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+            </packing>
+        </child>
+
+        <!-- EMERGENCY OVERRIDES -->
+        <child>
+          <object class="GtkFrame" id="frame_override">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label_xalign">0</property>
+            <property name="shadow_type">etched-out</property>
+            <child>
+              <object class="GtkVBox" id="vbox_override">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="spacing">2</property>
+                <property name="border_width">5</property>
+                
+                <child>
+                    <object class="GtkLabel" id="lbl_ovr_hint">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Uncheck to DISABLE motor (Emergency)</property>
+                        <attributes><attribute name="style" value="italic"/><attribute name="scale" value="0.9"/></attributes>
+                    </object>
+                </child>
+
+                <!-- J0 (Angle) -->
+                <child>
+                  <object class="GtkHBox" id="hbox_j0">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="HAL_CheckButton" id="j0-override">
+                        <property name="label" translatable="yes">J0 (Angle)</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                    <child>
+                      <object class="HAL_LED" id="j0-enable-status">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="led_blink_rate">0</property>
+                        <property name="pick_color_on">#00FF00</property>
+                        <property name="pick_color_off">#444444</property>
+                      </object>
+                      <packing><property name="expand">False</property><property name="fill">False</property><property name="padding">5</property></packing>
+                    </child>
+                  </object>
+                </child>
+
+                <!-- J1 (Radius) -->
+                <child>
+                  <object class="GtkHBox" id="hbox_j1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="HAL_CheckButton" id="j1-override">
+                        <property name="label" translatable="yes">J1 (Radius)</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                    <child>
+                      <object class="HAL_LED" id="j1-enable-status">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="led_blink_rate">0</property>
+                        <property name="pick_color_on">#00FF00</property>
+                        <property name="pick_color_off">#444444</property>
+                      </object>
+                      <packing><property name="expand">False</property><property name="fill">False</property><property name="padding">5</property></packing>
+                    </child>
+                  </object>
+                </child>
+
+                <!-- J2 (Height) -->
+                <child>
+                  <object class="GtkHBox" id="hbox_j2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="HAL_CheckButton" id="j2-override">
+                        <property name="label" translatable="yes">J2 (Height)</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                    <child>
+                      <object class="HAL_LED" id="j2-enable-status">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="led_blink_rate">0</property>
+                        <property name="pick_color_on">#00FF00</property>
+                        <property name="pick_color_off">#444444</property>
+                      </object>
+                      <packing><property name="expand">False</property><property name="fill">False</property><property name="padding">5</property></packing>
+                    </child>
+                  </object>
+                </child>
+
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel" id="label_override">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">⚠️ Emergency Overrides</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                  <attribute name="foreground" value="#cc0000"/>
+                </attributes>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+
+        <!-- HOME BUTTONS -->
+        <child>
+          <object class="GtkFrame" id="frame_home">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label_xalign">0</property>
+            <property name="shadow_type">etched-out</property>
+            <child>
+              <object class="GtkVBox" id="vbox_home">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="spacing">2</property>
+                <property name="border_width">5</property>
+
+                <child>
+                    <object class="GtkLabel" id="lbl_home_hint">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">J2 (Z): Jog first, then 'Home Here'</property>
+                        <attributes><attribute name="style" value="italic"/><attribute name="scale" value="0.9"/></attributes>
+                    </object>
+                </child>
+
+                <!-- J0 Row -->
+                <child>
+                  <object class="GtkHBox" id="hbox_home_j0">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="HAL_Button" id="home-j0">
+                        <property name="label" translatable="yes">Search J0</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                    <child>
+                      <object class="HAL_Button" id="quick-home-j0">
+                        <property name="label" translatable="yes">Home Here J0</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                  </object>
+                </child>
+
+                <!-- J1 Row -->
+                <child>
+                  <object class="GtkHBox" id="hbox_home_j1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="HAL_Button" id="home-j1">
+                        <property name="label" translatable="yes">Search J1</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                    <child>
+                      <object class="HAL_Button" id="quick-home-j1">
+                        <property name="label" translatable="yes">Home Here J1</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                  </object>
+                </child>
+
+                <!-- J2 Row -->
+                <child>
+                  <object class="GtkHBox" id="hbox_home_j2">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="HAL_Button" id="home-j2">
+                         <!-- Placeholder for J2 search, usually unused if no switch -->
+                        <property name="label" translatable="yes">Search J2</property>
+                        <property name="visible">True</property>
+                        <property name="sensitive">False</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                    <child>
+                      <object class="HAL_Button" id="quick-home-j2">
+                        <property name="label" translatable="yes">Home Here J2</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                      </object>
+                      <packing><property name="expand">True</property><property name="fill">True</property></packing>
+                    </child>
+                  </object>
+                </child>
+
+                <!-- ALL Button -->
+                 <child>
+                  <object class="HAL_Button" id="home-all">
+                    <property name="label" translatable="yes">Search Home ALL</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <!-- Make it bigger -->
+                    <property name="height_request">40</property> 
+                  </object>
+                </child>
+
+              </object>
+            </child>
+            <child type="label">
+              <object class="GtkLabel" id="label_homing">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">🏠 Homing</property>
+                <attributes><attribute name="weight" value="bold"/></attributes>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+
+        <!-- UNHOME BUTTONS -->
+        <child>
+             <object class="GtkFrame" id="frame_unhome">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label_xalign">0</property>
+                <property name="shadow_type">etched-out</property>
+
+                <child>
+                    <object class="GtkHBox" id="hbox_unhome">
+                        <property name="visible">True</property>
+                        <property name="spacing">2</property>
+                        <property name="border_width">5</property>
+                        
+                        <child><object class="HAL_Button" id="unhome-j0"><property name="label">J0</property><property name="visible">True</property></object><packing><property name="expand">True</property><property name="fill">True</property></packing></child>
+                        <child><object class="HAL_Button" id="unhome-j1"><property name="label">J1</property><property name="visible">True</property></object><packing><property name="expand">True</property><property name="fill">True</property></packing></child>
+                        <child><object class="HAL_Button" id="unhome-j2"><property name="label">J2</property><property name="visible">True</property></object><packing><property name="expand">True</property><property name="fill">True</property></packing></child>
+                        <child><object class="HAL_Button" id="unhome-all"><property name="label">All</property><property name="visible">True</property></object><packing><property name="expand">True</property><property name="fill">True</property></packing></child>
+                    </object>
+                </child>
+
+                <child type="label">
+                  <object class="GtkLabel" id="label_unhome">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">🔓 Unhome (Bypass)</property>
+                    <attributes><attribute name="weight" value="bold"/></attributes>
+                  </object>
+                </child>
+             </object>
+             <packing><property name="expand">False</property><property name="fill">True</property><property name="position">4</property></packing>
+        </child>
+
+
+        <!-- LIMIT SWITCH LEDs -->
+        <child>
+           <object class="GtkFrame" id="frame_limits">
+            <property name="visible">True</property>
+            <child>
+                <object class="GtkTable" id="table_limits">
+                    <property name="visible">True</property>
+                    <property name="n_rows">3</property>
+                    <property name="n_columns">3</property>
+                    <property name="column_spacing">10</property>
+                    <property name="row_spacing">5</property>
+                    <property name="border_width">5</property>
+
+                    <!-- J0 -->
+                    <child><object class="GtkLabel" id="l0"><property name="visible">True</property><property name="label">J0 Angle</property></object><packing><property name="left_attach">0</property><property name="right_attach">1</property><property name="top_attach">0</property><property name="bottom_attach">1</property></packing></child>
+                    <child><object class="HAL_LED" id="j0-min"><property name="visible">True</property><property name="pick_color_on">#FF0000</property><property name="pick_color_off">#00FF00</property></object><packing><property name="left_attach">1</property><property name="right_attach">2</property><property name="top_attach">0</property><property name="bottom_attach">1</property></packing></child>
+                    <child><object class="HAL_LED" id="j0-max"><property name="visible">True</property><property name="pick_color_on">#FF0000</property><property name="pick_color_off">#00FF00</property></object><packing><property name="left_attach">2</property><property name="right_attach">3</property><property name="top_attach">0</property><property name="bottom_attach">1</property></packing></child>
+
+                    <!-- J1 -->
+                    <child><object class="GtkLabel" id="l1"><property name="visible">True</property><property name="label">J1 Radius</property></object><packing><property name="left_attach">0</property><property name="right_attach">1</property><property name="top_attach">1</property><property name="bottom_attach">2</property></packing></child>
+                    <child><object class="HAL_LED" id="j1-min"><property name="visible">True</property><property name="pick_color_on">#FF0000</property><property name="pick_color_off">#00FF00</property></object><packing><property name="left_attach">1</property><property name="right_attach">2</property><property name="top_attach">1</property><property name="bottom_attach">2</property></packing></child>
+                    <child><object class="HAL_LED" id="j1-max"><property name="visible">True</property><property name="pick_color_on">#FF0000</property><property name="pick_color_off">#00FF00</property></object><packing><property name="left_attach">2</property><property name="right_attach">3</property><property name="top_attach">1</property><property name="bottom_attach">2</property></packing></child>
+
+                     <!-- J2 -->
+                    <child><object class="GtkLabel" id="l2"><property name="visible">True</property><property name="label">J2 Height</property></object><packing><property name="left_attach">0</property><property name="right_attach">1</property><property name="top_attach">2</property><property name="bottom_attach">3</property></packing></child>
+                    <child><object class="HAL_LED" id="j2-min"><property name="visible">True</property><property name="pick_color_on">#FF0000</property><property name="pick_color_off">#00FF00</property></object><packing><property name="left_attach">1</property><property name="right_attach">2</property><property name="top_attach">2</property><property name="bottom_attach">3</property></packing></child>
+                    <child><object class="HAL_LED" id="j2-max"><property name="visible">True</property><property name="pick_color_on">#FF0000</property><property name="pick_color_off">#00FF00</property></object><packing><property name="left_attach">2</property><property name="right_attach">3</property><property name="top_attach">2</property><property name="bottom_attach">3</property></packing></child>
+                </object>
+            </child>
+            <child type="label"><object class="GtkLabel" id="lbl_lim"><property name="visible">True</property><property name="label">🚦 Limits (Red=Hit)</property><attributes><attribute name="weight" value="bold"/></attributes></object></child>
+           </object>
+           <packing><property name="expand">False</property><property name="fill">True</property><property name="position">5</property></packing>
+        </child>
+
+        <!-- FEED OVERRIDE -->
+         <child>
+            <object class="GtkFrame" id="frame_feed">
+                <property name="visible">True</property>
+                <child>
+                    <object class="HAL_HBar" id="feed-bar">
+                        <property name="visible">True</property>
+                        <property name="min">0</property>
+                        <property name="max">200</property>
+                    </object>
+                </child>
+                <child type="label"><object class="GtkLabel" id="lbl_feed"><property name="visible">True</property><property name="label">Feed Override</property><attributes><attribute name="weight" value="bold"/></attributes></object></child>
+            </object>
+            <packing><property name="expand">False</property><property name="fill">True</property><property name="position">6</property></packing>
+        </child>
+
+        <!-- STATUS -->
+        <child>
+             <object class="GtkHBox" id="hbox_status">
+                <property name="visible">True</property>
+                <property name="spacing">10</property>
+                <child>
+                    <object class="GtkLabel" id="l_run"><property name="visible">True</property><property name="label">Running:</property></object>
+                    <packing><property name="expand">False</property><property name="fill">False</property></packing>
+                </child>
+                <child>
+                    <object class="HAL_LED" id="is-running">
+                        <property name="visible">True</property>
+                        <property name="pick_color_on">#00FF00</property>
+                        <property name="pick_color_off">#000000</property>
+                    </object>
+                    <packing><property name="expand">False</property><property name="fill">False</property></packing>
+                </child>
+                 <child>
+                    <object class="GtkLabel" id="l_estop"><property name="visible">True</property><property name="label">E-Stop:</property></object>
+                    <packing><property name="expand">False</property><property name="fill">False</property></packing>
+                </child>
+                <child>
+                    <object class="HAL_LED" id="estop-led">
+                        <property name="visible">True</property>
+                        <property name="pick_color_on">#00FF00</property>
+                        <property name="pick_color_off">#FF0000</property>
+                    </object>
+                    <packing><property name="expand">False</property><property name="fill">False</property></packing>
+                </child>
+             </object>
+             <packing><property name="expand">False</property><property name="fill">True</property><property name="padding">10</property><property name="position">7</property></packing>
+        </child>
+
+
+      </object>
+    </child>
+  </object>
+</interface>

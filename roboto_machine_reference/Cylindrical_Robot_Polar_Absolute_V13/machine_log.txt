@@ -1,0 +1,21 @@
+--- QtVCP Screen Started on: Wed, Jul 22 2026 12:41:27 PM ---
+--- QtDragon_hd Version 1.5 on Linuxcnc 2.9.10 ---
+Wed22 12:41: Machine OFF
+Wed22 12:41: Hard limits tripped
+Wed22 12:41: Tool 0: No Tool
+Wed22 12:42: Machine ON
+AUTO-RESUME: loading /home/kelvin6k/Downloads/Anshul S/new/Cylindrical_Robot_Polar_Absolute_V12/Print Calibrate/output/JULY 20 CURV PATTERN_offset_20260722_122247.ngc @ line 27
+Wed22 12:42: Loaded file /tmp/emcflt-fy71joxa.d/JULY 20 CURV PATTERN_offset_20260722_122247.ngc
+G92 preserved for auto-resume of JULY 20 CURV PATTERN_offset_20260722_122247.ngc.
+Wed22 12:49: Started program from line 27
+Wed22 12:49: Run timer stopped at 00:00:03
+Wed22 12:50: Print Cal: auto-loaded JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125035.ngc
+Wed22 12:50: Loaded file /tmp/emcflt-fy71joxa.d/JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125035.ngc
+Wed22 12:50: Print Cal: auto-loaded JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125039.ngc
+Wed22 12:50: Loaded file /tmp/emcflt-fy71joxa.d/JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125039.ngc
+Wed22 12:50: Print Cal: auto-loaded JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125041.ngc
+Wed22 12:50: Loaded file /tmp/emcflt-fy71joxa.d/JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125041.ngc
+Wed22 12:50: Print Cal: auto-loaded JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125044.ngc
+Wed22 12:50: Loaded file /tmp/emcflt-fy71joxa.d/JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125044.ngc
+Wed22 12:50: Print Cal: auto-loaded JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125051.ngc
+Wed22 12:50: Loaded file /tmp/emcflt-fy71joxa.d/JULY 20 CURV PATTERN_offset_20260722_122247_offset_20260722_125051.ngc

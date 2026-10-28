@@ -1,0 +1,109 @@
+# Sim HAL — no EtherCAT, no servo drives, no helpers.
+# Purpose: boot QtDragon on a dev box for UI customization.
+# Each joint's command is looped straight to its feedback so the
+# UI shows motion when you jog/run G-code.
+
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS num_dio=5
+
+# Emergency Axis Override gates + Aux Motor PWM chain — ported from AXIS
+# cylindrical_robot.hal. Indices:
+#   and2.0/1/2 — joint enable AND override checkbox (Feature 2)
+#   scale.6/7/8, mux2.3/4/5 — Aux PWM chain (slider% -> 0..1, gated by panel)
+# Aux motors are now wired direct from the panel checkbox into mux2.sel,
+# so no and2 gates are needed for them (M64/M65 P4 is no longer involved).
+# Production also loads scale.0..5 + mux2.0..2 + conv-* for the real
+# EtherCAT command chain; sim doesn't need those but loads the full
+# scale/mux2 count so indices stay identical to the production HAL.
+loadrt and2 count=3
+loadrt scale count=9
+loadrt mux2 count=6
+
+addf and2.0 servo-thread
+addf and2.1 servo-thread
+addf and2.2 servo-thread
+addf motion-command-handler servo-thread
+addf motion-controller      servo-thread
+# Aux PWM chain — panel checkbox -> mux2.sel directly; slider% -> scale -> mux2.in1.
+addf scale.6 servo-thread
+addf scale.7 servo-thread
+addf scale.8 servo-thread
+addf mux2.3 servo-thread
+addf mux2.4 servo-thread
+addf mux2.5 servo-thread
+
+# Aux PWM chain — same setp values as production cylindrical_robot.hal.
+# scale.N.gain 0.01 converts slider 0..100 to 0..1 for PWM.
+# mux2.N.in0 0.0 = OFF state when sel=0.
+setp scale.6.gain 0.01
+setp scale.7.gain 0.01
+setp scale.8.gain 0.01
+setp mux2.3.in0 0.0
+setp mux2.4.in0 0.0
+setp mux2.5.in0 0.0
+# mux2.N.out has no consumer in sim (no pwm-ctrl userspace comp loaded);
+# HAL allows source-only signals. Signal names mirror production for clarity.
+net extruder-pwm  mux2.3.out
+net pump-pwm      mux2.4.out
+net fluid-pwm     mux2.5.out
+
+# Emergency Axis Override — joint enable feeds and2.N.in0
+net j0-enable-raw joint.0.amp-enable-out => and2.0.in0
+net j1-enable-raw joint.1.amp-enable-out => and2.1.in0
+net j2-enable-raw joint.2.amp-enable-out => and2.2.in0
+net j0-enable-with-override and2.0.out
+net j1-enable-with-override and2.1.out
+net j2-enable-with-override and2.2.out
+
+# --- Joint loopbacks (cmd -> fb) ---
+net j0-cmd-fb joint.0.motor-pos-cmd => joint.0.motor-pos-fb
+net j1-cmd-fb joint.1.motor-pos-cmd => joint.1.motor-pos-fb
+net j2-cmd-fb joint.2.motor-pos-cmd => joint.2.motor-pos-fb
+
+# --- E-Stop loopback ---
+# Sim keeps the simple direct loopback. Features 7/8/9 (auto-home,
+# drives-ready interlock, F1 popup) are production-only because they
+# depend on physical hardware that sim does not have:
+#   - abs_home.py reads live EtherCAT encoder counts (no encoders in sim)
+#   - drives-ready interlock ANDs cia402.is-ready{0,1,2} (no cia402 in sim)
+#   - estop_gate.py popups fire when drives-ready=0 (always true in sim)
+# In sim, F1 always clears E-stop immediately and homing uses INI defaults.
+net estop-loop iocontrol.0.user-enable-out => iocontrol.0.emc-enable-in
+
+# --- Tool change loopback (instant ack) ---
+net tool-prep-loop  iocontrol.0.tool-prepare    => iocontrol.0.tool-prepared
+net tool-change-loop iocontrol.0.tool-change    => iocontrol.0.tool-changed
+
+# --- Position Saver (ported from AXIS cylindrical_robot.hal) ---
+# Writes saved_positions.json + tracks current G-code line; exports
+# pos-saver.{j0,j1,j2}-last-home + pos-saver.gcode-line for the
+# QtDragon "Last Saved Position" readouts (wired in postgui_sim.hal).
+# Inputs are joined to the existing j{0,1,2}-cmd-fb loopback signals.
+loadusr -Wn pos-saver ./position_saver.py
+net j0-cmd-fb     => pos-saver.j0-pos
+net j1-cmd-fb     => pos-saver.j1-pos
+net j2-cmd-fb     => pos-saver.j2-pos
+net joint0-homed joint.0.homed => pos-saver.j0-homed
+net joint1-homed joint.1.homed => pos-saver.j1-homed
+net joint2-homed joint.2.homed => pos-saver.j2-homed
+
+# Absolute-Encoder Home Computer (sim-mode) — Feature 7 parity with prod.
+# Sim has no real encoders, so the encoder-read + INI-patch dance is
+# disabled by setp sim-mode=1. abs_home.py just pulses trigger-home on
+# F2 → halui.home-all (wired in postgui_sim.hal). Joints home-in-place
+# at whatever HOME_OFFSET the INI already has.
+loadusr -Wn abs-home ./abs_home.py
+setp abs-home.sim-mode 1
+
+# --- J0/J1/J2 Absolute-Encoder Calibration helpers — sim parity ---
+# Production loads these from cylindrical_robot.hal with real EtherCAT
+# encoder feeds. Sim has no encoders, so encoder-raw stays at 0 (HAL_IN
+# default) — cal-encoder/predicted-pos read 0 in sim. Enough for the
+# CALIBRATE tab to render its HALLabels/LEDs and for button clicks to
+# round-trip through the helper. joint0/1-homed signals already exist
+# (sourced for pos-saver above).
+loadusr -Wn j0-cal ./j0_calibrate.py
+net joint0-homed      => j0-cal.j0-homed
+loadusr -Wn j1-cal ./j1_calibrate.py
+net joint1-homed      => j1-cal.j1-homed
+loadusr -Wn j2-cal ./j2_calibrate.py

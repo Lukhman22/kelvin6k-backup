@@ -1,0 +1,315 @@
+# 3D Cylindrical Robot HAL Configuration
+# Uses polarkins for Cartesian-to-Polar conversion
+# Slave 0 = Angle (SV660), Slave 1 = Z Height (SV670I), Slave 2 = Radius (SV660)
+# Limit Switches: DI1 (bit16) or DI2 (bit17) = min/home, DI3 (bit18) = max
+
+# --- EtherCAT Configuration ---
+loadusr -W lcec_conf ethercat-conf.xml
+
+# --- Load Realtime Components ---
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS num_dio=5
+loadrt lcec
+loadrt scale count=9
+loadrt conv_float_s32 count=3
+loadrt conv_s32_float count=3
+loadrt mux2 count=6
+
+# For dashboard override, limit switches, unhome logic
+# and2.0/1/2 = joint enable override (panel checkbox AND amp-enable-out)
+# and2.3, and2.4 = chained AND3 of cia402.is-readyN → drives-ready
+# and2.5 = drives-ready AND iocontrol.user-enable-out → emc-enable-in (E-stop gate)
+# (Aux motors are now wired direct from panel checkbox; no AND gates needed there.)
+loadrt and2 count=6
+loadrt or2 count=9
+loadrt mult2 count=1
+# Auto-home pulse on machine-on (normal mode); idle in calibrate mode
+loadrt oneshot count=1
+
+# --- Add Functions to Servo Thread ---
+addf lcec.read-all servo-thread
+# Drive 0 (Angle) converters
+addf conv-s32-float.0 servo-thread
+addf scale.0 servo-thread
+# Drive 1 (Radius) converters
+addf conv-s32-float.1 servo-thread
+addf scale.2 servo-thread
+# Drive 2 (Z Height) converters
+addf conv-s32-float.2 servo-thread
+addf scale.4 servo-thread
+# AND gates for emergency override (checkbox x LinuxCNC enable)
+addf and2.0 servo-thread
+addf and2.1 servo-thread
+addf and2.2 servo-thread
+# AND gates: drives-ready chain + E-stop gate
+addf and2.3 servo-thread
+addf and2.4 servo-thread
+addf and2.5 servo-thread
+# OR gates for quick-home and unhome
+addf or2.0 servo-thread
+addf or2.1 servo-thread
+addf or2.2 servo-thread
+addf or2.3 servo-thread
+addf or2.4 servo-thread
+addf or2.5 servo-thread
+# OR gates for resume-home (individual home OR resume button)
+addf or2.6 servo-thread
+addf or2.7 servo-thread
+addf or2.8 servo-thread
+# Feed override display
+addf mult2.0 servo-thread
+# Auto-home pulse generator (driven from postgui.hal)
+addf oneshot.0 servo-thread
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+# Drive 0 (Angle) command chain
+addf scale.1 servo-thread
+addf mux2.0 servo-thread
+addf conv-float-s32.0 servo-thread
+# Drive 1 (Radius) command chain
+addf scale.3 servo-thread
+addf mux2.1 servo-thread
+addf conv-float-s32.1 servo-thread
+# Drive 2 (Z Height) command chain
+addf scale.5 servo-thread
+addf mux2.2 servo-thread
+addf conv-float-s32.2 servo-thread
+# Auxiliary motor PWM: scale (% -> 0-1) + mux2 (on/off switch)
+addf scale.6 servo-thread
+addf scale.7 servo-thread
+addf scale.8 servo-thread
+addf mux2.3 servo-thread
+addf mux2.4 servo-thread
+addf mux2.5 servo-thread
+addf lcec.write-all servo-thread
+
+# --- CiA402 State Machine (handles both drives) ---
+loadusr -W ./cia402.py
+
+# ============================================================
+# JOINT 0: Angle (degrees) - REAL DRIVE (Slave 0)
+# Scale: 1694.4444 pulses per degree (gear ratio)
+# ============================================================
+
+# Enable through AND gate (override checkbox on in1, connected in postgui.hal)
+net j0-enable-raw joint.0.amp-enable-out => and2.0.in0
+net j0-enable-with-override and2.0.out => cia402.enable0
+
+# Feedback Chain: lcec(s32) -> conv -> scale -> joint
+net angle-pos-fb-raw lcec.0.0.actual-position => conv-s32-float.0.in
+net angle-pos-fb-f   conv-s32-float.0.out => scale.0.in
+setp scale.0.gain 0.000590277778
+net angle-pos-fb     scale.0.out => joint.0.motor-pos-fb
+
+# Command Chain: joint -> scale -> mux2 -> conv -> lcec(s32)
+# mux2 selects: in0=actual (when disabled) / in1=command (when enabled)
+net angle-pos-cmd    joint.0.motor-pos-cmd => scale.1.in
+setp scale.1.gain 1694.4444
+net angle-pos-fb-f => mux2.0.in0
+net angle-pos-cmd-s  scale.1.out => mux2.0.in1
+net j0-is-enabled cia402.is-enabled0 => mux2.0.sel
+net angle-pos-muxed  mux2.0.out => conv-float-s32.0.in
+net angle-pos-cmd-raw conv-float-s32.0.out => lcec.0.0.target-position
+
+# Connect CiA402 to lcec (Drive 0)
+net status-word0  lcec.0.0.cia-statusword => cia402.statusword0
+net control-word0 cia402.controlword0 => lcec.0.0.cia-controlword
+
+# ============================================================
+# JOINT 1: Radius (mm) - REAL DRIVE (Slave 2)
+# Scale: 60.1 pulses per mm (gear ratio)
+# ============================================================
+
+# Enable through AND gate (override checkbox on in1, connected in postgui.hal)
+net j1-enable-raw joint.1.amp-enable-out => and2.1.in0
+net j1-enable-with-override and2.1.out => cia402.enable1
+
+# Feedback Chain: lcec(s32) -> conv -> scale -> joint
+net radius-pos-fb-raw lcec.0.2.actual-position => conv-s32-float.1.in
+net radius-pos-fb-f   conv-s32-float.1.out => scale.2.in
+setp scale.2.gain 0.016638935
+net radius-pos-fb     scale.2.out => joint.1.motor-pos-fb
+
+# Command Chain: joint -> scale -> mux2 -> conv -> lcec(s32)
+# mux2 selects: in0=actual (when disabled) / in1=command (when enabled)
+net radius-pos-cmd    joint.1.motor-pos-cmd => scale.3.in
+setp scale.3.gain 60.1
+net radius-pos-fb-f => mux2.1.in0
+net radius-pos-cmd-s  scale.3.out => mux2.1.in1
+net j1-is-enabled cia402.is-enabled1 => mux2.1.sel
+net radius-pos-muxed  mux2.1.out => conv-float-s32.1.in
+net radius-pos-cmd-raw conv-float-s32.1.out => lcec.0.2.target-position
+
+# Connect CiA402 to lcec (Drive 1)
+net status-word1  lcec.0.2.cia-statusword => cia402.statusword1
+net control-word1 cia402.controlword1 => lcec.0.2.cia-controlword
+
+# ============================================================
+# JOINT 2: Z Height (mm) - REAL DRIVE (Slave 1)
+# Scale: 1666.666 pulses per mm
+# ============================================================
+
+# Enable through AND gate (override checkbox on in1, connected in postgui.hal)
+net j2-enable-raw joint.2.amp-enable-out => and2.2.in0
+net j2-enable-with-override and2.2.out => cia402.enable2
+
+# Feedback Chain: lcec(s32) -> conv -> scale -> joint
+net z-pos-fb-raw lcec.0.1.actual-position => conv-s32-float.2.in
+net z-pos-fb-f   conv-s32-float.2.out => scale.4.in
+setp scale.4.gain 0.0006
+net z-pos-fb     scale.4.out => joint.2.motor-pos-fb
+
+# Command Chain: joint -> scale -> mux2 -> conv -> lcec(s32)
+# mux2 selects: in0=actual (when disabled) / in1=command (when enabled)
+net z-pos-cmd    joint.2.motor-pos-cmd => scale.5.in
+setp scale.5.gain 1666.666
+net z-pos-fb-f => mux2.2.in0
+net z-pos-cmd-s  scale.5.out => mux2.2.in1
+net j2-is-enabled cia402.is-enabled2 => mux2.2.sel
+net z-pos-muxed  mux2.2.out => conv-float-s32.2.in
+net z-pos-cmd-raw conv-float-s32.2.out => lcec.0.1.target-position
+
+# Connect CiA402 to lcec (Drive 2)
+net status-word2  lcec.0.1.cia-statusword => cia402.statusword2
+net control-word2 cia402.controlword2 => lcec.0.1.cia-controlword
+
+# ============================================================
+# LIMIT SWITCHES via SV660 CN1 Digital Inputs
+# DI2 (Bit 1) = Minimum/Home Limit Switch
+# Using bitslice to extract Bit 1 from the u32 digital-inputs
+# ============================================================
+
+# Load bitslice component to extract bits from 32-bit integer
+# Use personality to specify width (usually defaults to 16, need 32 for full u32)
+loadrt bitslice count=3 personality=32,32,32
+
+# Add bitslice to servo thread
+addf bitslice.0 servo-thread
+addf bitslice.1 servo-thread
+addf bitslice.2 servo-thread
+
+# --- Joint 0 (Angle) Limit Switch Setup ---
+net j0-din-raw lcec.0.0.digital-inputs => bitslice.0.in
+# DI2 (bit17) = Min/Home limit
+net j0-min-limit-raw bitslice.0.out-17 => or2.0.in0
+setp or2.0.in1 0
+net j0-home-combined or2.0.out => joint.0.home-sw-in joint.0.neg-lim-sw-in
+# DI3 (bit18) = Max limit
+net j0-max-limit-raw bitslice.0.out-18 => joint.0.pos-lim-sw-in
+
+# --- Joint 1 (Radius) Limit Switch Setup ---
+net j1-din-raw lcec.0.2.digital-inputs => bitslice.1.in
+# DI1 (bit16) = Home switch
+net j1-home-raw bitslice.1.out-16
+net j1-home-raw or2.1.in0
+net j1-quick-home-pulse => or2.1.in1
+net j1-home-combined or2.1.out => joint.1.home-sw-in
+# DI2 (bit17) = Min limit
+net j1-min-limit-raw bitslice.1.out-17 => joint.1.neg-lim-sw-in
+# DI3 (bit18) = Max limit
+net j1-max-limit-raw bitslice.1.out-18 => joint.1.pos-lim-sw-in
+
+# --- Joint 2 (Z Height) Limit Switch Setup ---
+# Z has no physical limit switches - home in place by jogging
+net j2-din-raw lcec.0.1.digital-inputs => bitslice.2.in
+net j2-min-limit-raw bitslice.2.out-17 => or2.2.in0
+setp or2.2.in1 0
+net j2-home-combined or2.2.out => joint.2.home-sw-in
+net j2-max-limit-raw bitslice.2.out-18
+
+# --- Drives-Ready signal (AND of cia402.is-readyN) ---
+# cia402.is-readyN is true when the drive's statusword is non-zero and not
+# faulted — i.e. the EtherCAT slave is talking and the drive is willing to
+# transition out of FAULT.
+net j0-drive-ready cia402.is-ready0 => and2.3.in0
+net j1-drive-ready cia402.is-ready1 => and2.3.in1
+net j01-drives-ready and2.3.out => and2.4.in0
+net j2-drive-ready cia402.is-ready2 => and2.4.in1
+net drives-ready and2.4.out
+
+# --- E-Stop Loopback gated by drives-ready ---
+# Until all 3 drives report ready, emc-enable-in stays low — pressing F1
+# will not actually clear LinuxCNC's E-stop. estop_gate.py shows a popup
+# when this happens.
+net estop-user-out iocontrol.0.user-enable-out => and2.5.in0
+net drives-ready => and2.5.in1
+net estop-loop and2.5.out => iocontrol.0.emc-enable-in
+
+# --- F1 Popup Watcher (drives-not-ready warning) ---
+loadusr -Wn estop-gate ./estop_gate.py
+net drives-ready                       => estop-gate.drives-ready
+net estop-user-request iocontrol.0.user-request-enable => estop-gate.user-request
+
+# --- Real-time Polar Visualizer ---
+# Removed: the Tk-based polar_visualizer.py userspace component and its
+# Qt-side replacement (the POLAR top tab) have both been removed. Source
+# signals x-world-pos / y-world-pos / joint0-homed are still used
+# elsewhere (postgui_qtdragon.hal feeds them to qtdragon.pos-* HALLabels).
+
+# --- J0 Absolute-Encoder Calibration helper ---
+loadusr -Wn j0-cal ./j0_calibrate.py
+net angle-pos-fb-raw  => j0-cal.encoder-raw
+net joint0-homed      => j0-cal.j0-homed
+
+# --- J1 Absolute-Encoder Calibration helper ---
+loadusr -Wn j1-cal ./j1_calibrate.py
+net radius-pos-fb-raw => j1-cal.encoder-raw
+net joint1-homed      => j1-cal.j1-homed
+
+# --- J2 Absolute-Encoder Calibration helper ---
+loadusr -Wn j2-cal ./j2_calibrate.py
+net z-pos-fb-raw      => j2-cal.encoder-raw
+
+# --- Absolute-Encoder Home Computer (replaces pre-launch SDO read) ---
+# On F2 (halui.machine.is-on rising edge), reads live encoder counts, looks
+# up *_calibration.json, sets ini.N.home / ini.N.home_offset via halcmd, then
+# pulses trigger-home (wired to halui.home-all in postgui.hal).
+loadusr -Wn abs-home ./abs_home.py
+# Use the float-converted (conv-s32-float.out) feedback nets — these are the
+# raw encoder counts as floats, before the per-degree/per-mm scale is applied.
+net angle-pos-fb-f  => abs-home.j0-enc-raw
+net radius-pos-fb-f => abs-home.j1-enc-raw
+net z-pos-fb-f      => abs-home.j2-enc-raw
+
+# --- Position Saver (all 3 absolute joints) ---
+loadusr -Wn pos-saver ./position_saver.py
+net angle-pos-fb  => pos-saver.j0-pos
+net radius-pos-fb => pos-saver.j1-pos
+net z-pos-fb      => pos-saver.j2-pos
+net joint0-homed  => pos-saver.j0-homed
+net joint1-homed joint.1.homed => pos-saver.j1-homed
+net joint2-homed  joint.2.homed => pos-saver.j2-homed
+
+# ============================================================
+# ESP32 PWM CONTROLLER
+# Controls 3 PWM outputs for auxiliary motors:
+#   - Extruder (SV670P drive)
+#   - Pump (VFD)
+#   - Fluid Pump (DC motor)
+# Control via G-code: M67 E0-E2 Q0-1.0 (immediate)
+#                     M68 E0-E2 Q0-1.0 (synchronized)
+# No enable pins - set speed to 0 to stop.
+# ============================================================
+
+loadusr -Wn pwm-ctrl ./pwm_controller.py
+
+# --- Auxiliary Motor PWM via Panel Controls ---
+# Panel sliders (0-100%) are scaled to 0.0-1.0, then mux2 switches on/off.
+# This bypasses motion.analog-out so controls work during program execution.
+# PyVCP connections are made in postgui.hal.
+
+# Extruder: scale.6 (slider %) -> mux2.3 (on/off) -> pwm-ctrl.extruder
+setp scale.6.gain 0.01
+setp mux2.3.in0 0.0
+net extruder-pwm mux2.3.out => pwm-ctrl.extruder
+
+# Pump: scale.7 (slider %) -> mux2.4 (on/off) -> pwm-ctrl.pump
+setp scale.7.gain 0.01
+setp mux2.4.in0 0.0
+net pump-pwm mux2.4.out => pwm-ctrl.pump
+
+# Fluid Pump: scale.8 (slider %) -> mux2.5 (on/off) -> pwm-ctrl.fluid-pump
+setp scale.8.gain 0.01
+setp mux2.5.in0 0.0
+net fluid-pwm mux2.5.out => pwm-ctrl.fluid-pump
+

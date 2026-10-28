@@ -1,0 +1,82 @@
+<masters>
+  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="1">
+    <!-- Slave 0: Angle drive (Joint 0) - SV660N -->
+    <slave idx="0" type="generic" vid="0x00100000" pid="0x000c010d" configPdos="false">
+      <dcConf assignActivate="0x0300" sync0Cycle="*1" sync0Shift="0"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1701">
+          <pdoEntry idx="6040" subIdx="0" bitLen="16" halPin="cia-controlword" halType="u32"/>
+          <pdoEntry idx="607a" subIdx="0" bitLen="32" halPin="target-position" halType="s32"/>
+          <pdoEntry idx="60b8" subIdx="0" bitLen="16" halPin="probe-control" halType="u32"/>
+          <pdoEntry idx="60fe" subIdx="1" bitLen="32" halPin="digital-outputs" halType="u32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1b01">
+          <pdoEntry idx="603f" subIdx="0" bitLen="16" halPin="error-code" halType="u32"/>
+          <pdoEntry idx="6041" subIdx="0" bitLen="16" halPin="cia-statusword" halType="u32"/>
+          <pdoEntry idx="6064" subIdx="0" bitLen="32" halPin="actual-position" halType="s32"/>
+          <pdoEntry idx="6077" subIdx="0" bitLen="16" halPin="torque-actual" halType="s32"/>
+          <pdoEntry idx="60f4" subIdx="0" bitLen="32" halPin="following-error" halType="s32"/>
+          <pdoEntry idx="60b9" subIdx="0" bitLen="16" halPin="probe-status" halType="u32"/>
+          <pdoEntry idx="60ba" subIdx="0" bitLen="32" halPin="probe-pos-1" halType="s32"/>
+          <pdoEntry idx="60bc" subIdx="0" bitLen="32" halPin="probe-pos-2" halType="s32"/>
+          <pdoEntry idx="60fd" subIdx="0" bitLen="32" halPin="digital-inputs" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>
+    
+    <!-- Slave 1: Z Height drive (Joint 2) - SV670I -->
+    <slave idx="1" type="generic" vid="0x00100000" pid="0x000c0130" configPdos="true">
+      <dcConf assignActivate="0x0300" sync0Cycle="*1" sync0Shift="0"/>
+      <!-- SDO Config handled by external script setup_j2.sh -->
+      <syncManager idx="2" dir="out">
+        <pdo idx="1701">
+          <pdoEntry idx="6040" subIdx="0" bitLen="16" halPin="cia-controlword" halType="u32"/>
+          <pdoEntry idx="607a" subIdx="0" bitLen="32" halPin="target-position" halType="s32"/>
+          <pdoEntry idx="60b8" subIdx="0" bitLen="16" halPin="probe-control" halType="u32"/>
+          <pdoEntry idx="60fe" subIdx="1" bitLen="32" halPin="digital-outputs" halType="u32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1b01">
+          <pdoEntry idx="603f" subIdx="0" bitLen="16" halPin="error-code" halType="u32"/>
+          <pdoEntry idx="6041" subIdx="0" bitLen="16" halPin="cia-statusword" halType="u32"/>
+          <pdoEntry idx="6064" subIdx="0" bitLen="32" halPin="actual-position" halType="s32"/>
+          <pdoEntry idx="6077" subIdx="0" bitLen="16" halPin="torque-actual" halType="s32"/>
+          <pdoEntry idx="60f4" subIdx="0" bitLen="32" halPin="following-error" halType="s32"/>
+          <pdoEntry idx="60b9" subIdx="0" bitLen="16" halPin="probe-status" halType="u32"/>
+          <pdoEntry idx="60ba" subIdx="0" bitLen="32" halPin="probe-pos-1" halType="s32"/>
+          <pdoEntry idx="60bc" subIdx="0" bitLen="32" halPin="probe-pos-2" halType="s32"/>
+          <pdoEntry idx="60fd" subIdx="0" bitLen="32" halPin="digital-inputs" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>
+    
+    <!-- Slave 2: Radius drive (Joint 1) - SV660 -->
+    <slave idx="2" type="generic" vid="0x00100000" pid="0x000c010d" configPdos="false">
+      <dcConf assignActivate="0x0300" sync0Cycle="*1" sync0Shift="0"/>
+      <syncManager idx="2" dir="out">
+        <pdo idx="1701">
+          <pdoEntry idx="6040" subIdx="0" bitLen="16" halPin="cia-controlword" halType="u32"/>
+          <pdoEntry idx="607a" subIdx="0" bitLen="32" halPin="target-position" halType="s32"/>
+          <pdoEntry idx="60b8" subIdx="0" bitLen="16" halPin="probe-control" halType="u32"/>
+          <pdoEntry idx="60fe" subIdx="1" bitLen="32" halPin="digital-outputs" halType="u32"/>
+        </pdo>
+      </syncManager>
+      <syncManager idx="3" dir="in">
+        <pdo idx="1b01">
+          <pdoEntry idx="603f" subIdx="0" bitLen="16" halPin="error-code" halType="u32"/>
+          <pdoEntry idx="6041" subIdx="0" bitLen="16" halPin="cia-statusword" halType="u32"/>
+          <pdoEntry idx="6064" subIdx="0" bitLen="32" halPin="actual-position" halType="s32"/>
+          <pdoEntry idx="6077" subIdx="0" bitLen="16" halPin="torque-actual" halType="s32"/>
+          <pdoEntry idx="60f4" subIdx="0" bitLen="32" halPin="following-error" halType="s32"/>
+          <pdoEntry idx="60b9" subIdx="0" bitLen="16" halPin="probe-status" halType="u32"/>
+          <pdoEntry idx="60ba" subIdx="0" bitLen="32" halPin="probe-pos-1" halType="s32"/>
+          <pdoEntry idx="60bc" subIdx="0" bitLen="32" halPin="probe-pos-2" halType="s32"/>
+          <pdoEntry idx="60fd" subIdx="0" bitLen="32" halPin="digital-inputs" halType="u32"/>
+        </pdo>
+      </syncManager>
+    </slave>
+  </master>
+</masters>

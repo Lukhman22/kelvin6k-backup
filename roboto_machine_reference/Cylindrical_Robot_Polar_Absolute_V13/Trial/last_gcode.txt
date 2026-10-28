@@ -1,0 +1,1 @@
+/home/kelvin6k/linuxcnc/nc_files/may_25_Pillar_P1.ngc

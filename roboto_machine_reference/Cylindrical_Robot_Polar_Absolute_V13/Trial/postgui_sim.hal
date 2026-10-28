@@ -1,0 +1,109 @@
+# ============================================================
+# POST-GUI HAL — Simulation variant (Safe Boot)
+# ============================================================
+
+# Live joint position display
+net j0-cmd-fb => qtdragon.nowpos-j0
+net j1-cmd-fb => qtdragon.nowpos-j1
+net j2-cmd-fb => qtdragon.nowpos-j2
+
+# Last-saved-position display — backend ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). pos-saver is loaded
+# in cylindrical_robot_sim.hal and fed simulated joint positions +
+# homed flags. Same nets as production postgui_qtdragon.hal.
+net last-home-j0      pos-saver.j0-last-home => qtdragon.lastpos-j0
+net last-home-j1      pos-saver.j1-last-home => qtdragon.lastpos-j1
+net last-home-j2      pos-saver.j2-last-home => qtdragon.lastpos-j2
+net gcode-line-display pos-saver.gcode-line  => qtdragon.lastpos-line
+
+# Emergency Axis Override — backend ported verbatim from AXIS
+# (cylindrical_robot_Polar_Absolute/postgui.hal). Same nets as
+# production postgui_qtdragon.hal. and2.0/1/2 + j{0,1,2}-enable-raw
+# + j{0,1,2}-enable-with-override are created in cylindrical_robot_sim.hal.
+net j0-override-btn qtdragon.j0-override => and2.0.in1
+net j1-override-btn qtdragon.j1-override => and2.1.in1
+net j2-override-btn qtdragon.j2-override => and2.2.in1
+net j0-enable-with-override => qtdragon.led-j0-enabled
+net j1-enable-with-override => qtdragon.led-j1-enabled
+net j2-enable-with-override => qtdragon.led-j2-enabled
+
+# Limit Switch Status — no real limit signals in sim (no EtherCAT
+# digital inputs, no bitslice). The 6 qtdragon.lim-j{0,1,2}-{min,max}
+# HAL_IN pins created by the LED widgets default to 0 = safe = green,
+# which is the correct sim behaviour. Deliberately not wired here.
+
+# Machine Status LEDs — same nets as production. estop-loop signal is
+# already created in cylindrical_robot_sim.hal (iocontrol loopback).
+net prog-running halui.program.is-running => qtdragon.is-running
+net estop-loop                              => qtdragon.estop-led
+
+# Auto-home on machine-on (Feature 7, sim-mode) — same nets as production
+# postgui_qtdragon.hal. abs-home is loaded in cylindrical_robot_sim.hal
+# with sim-mode=1 so it skips the encoder math and just pulses
+# trigger-home → halui.home-all. Joints home-in-place to INI HOME_OFFSET.
+net machine-is-on   halui.machine.is-on    => abs-home.machine-on
+net auto-home-pulse abs-home.trigger-home  => halui.home-all
+
+# Tool Position (Cartesian) — same nets as production. axis.{x,y,z}.pos-cmd
+# exists in sim (KINEMATICS = trivkins coordinates=XYZ). x-world-pos and
+# y-world-pos are created fresh here (sim has no polar_viz wiring).
+net x-world-pos axis.x.pos-cmd => qtdragon.pos-x
+net y-world-pos axis.y.pos-cmd => qtdragon.pos-y
+net z-world-pos axis.z.pos-cmd => qtdragon.pos-z
+
+# === CALIBRATE tab — sim parity with postgui_qtdragon.hal ===
+# j0/j1/j2-cal userspace helpers are loaded in cylindrical_robot_sim.hal
+# with no encoder source (sim has no real encoders), so the displayed
+# values are zero — but the wiring exercises every HAL pin the CALIBRATE
+# tab reads so the UI renders identically to production.
+net j0-calibrate-btn qtdragon.cal-j0       => j0-cal.calibrate
+net j1-calibrate-btn qtdragon.cal-j1       => j1-cal.calibrate
+net j2-calibrate-btn qtdragon.cal-j2       => j2-cal.calibrate
+net j0-cal-valid-d   j0-cal.cal-valid     => qtdragon.led-cal-j0-valid
+net j0-cal-encoder-d j0-cal.cal-encoder   => qtdragon.cal-j0-enc
+net j0-encoder-now-d j0-cal.encoder-now   => qtdragon.cal-j0-enc-now
+net j0-predicted-pos j0-cal.predicted-pos => qtdragon.cal-j0-pred
+net j1-cal-valid-d   j1-cal.cal-valid     => qtdragon.led-cal-j1-valid
+net j1-cal-armed-d   j1-cal.cal-armed     => qtdragon.led-cal-j1-armed
+net j1-cal-encoder-d j1-cal.cal-encoder   => qtdragon.cal-j1-enc
+net j1-encoder-now-d j1-cal.encoder-now   => qtdragon.cal-j1-enc-now
+net j1-predicted-pos j1-cal.predicted-pos => qtdragon.cal-j1-pred
+net j2-cal-valid-d   j2-cal.cal-valid     => qtdragon.led-cal-j2-valid
+net j2-cal-encoder-d j2-cal.cal-encoder   => qtdragon.cal-j2-enc
+net j2-encoder-now-d j2-cal.encoder-now   => qtdragon.cal-j2-enc-now
+net j2-predicted-pos j2-cal.predicted-pos => qtdragon.cal-j2-pred
+
+# =====================================================================
+# Auxiliary Motor Control — DIRECT CONTROL (no M64/M65 P4 master gate).
+# Mirrors production postgui_qtdragon.hal. Checkbox ON -> motor runs at
+# slider %; OFF -> stops. motion.digital-out-04 is no longer involved.
+# =====================================================================
+
+# --- Extruder ---
+net aux-ext-slider qtdragon.aux-ext-speed-f => scale.6.in qtdragon.aux-ext-display
+net aux-ext-scaled scale.6.out              => mux2.3.in1
+net aux-ext-on     qtdragon.aux-ext-on      => mux2.3.sel qtdragon.aux-ext-led
+
+# --- Pump ---
+net aux-pump-slider qtdragon.aux-pump-speed-f => scale.7.in qtdragon.aux-pump-display
+net aux-pump-scaled scale.7.out               => mux2.4.in1
+net aux-pump-on     qtdragon.aux-pump-on      => mux2.4.sel qtdragon.aux-pump-led
+
+# --- Fluid Pump ---
+net aux-fluid-slider qtdragon.aux-fluid-speed-f => scale.8.in qtdragon.aux-fluid-display
+net aux-fluid-scaled scale.8.out                => mux2.5.in1
+net aux-fluid-on     qtdragon.aux-fluid-on      => mux2.5.sel qtdragon.aux-fluid-led
+
+# =====================================================================
+# J1 jog-speed slider — pin exported by handler, currently unwired.
+# LinuxCNC's halui has only GLOBAL jog-speed pins (halui.joint.jog-speed,
+# halui.axis.jog-speed); per-joint variants like halui.joint.1.jog-speed
+# do not exist. Mirror production postgui_qtdragon.hal exactly.
+# =====================================================================
+
+# Calibrate tab — sim has no j0/j1-cal userspace components, so the
+# handler-created qtdragon.cal-j{0,1} BIT-OUT button pins stay
+# unconnected (HAL allows source-only signals) and the
+# qtdragon.led-cal-j{0,1}-valid LED inputs default to 0 = dark.
+# Pressing CALIBRATE J0/J1 in sim is a no-op, matching the AXIS
+# behaviour when start_linuxcnc.sh is not in calibrate mode.

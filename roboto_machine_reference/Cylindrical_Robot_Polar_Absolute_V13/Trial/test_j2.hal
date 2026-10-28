@@ -1,0 +1,70 @@
+# Test HAL for J2 (Z-axis, SV670N) only
+
+# --- EtherCAT Configuration ---
+# Loading the existing configuration which includes all 3 drives
+# We will only use Slave 2 (Joint 2) in this test
+loadusr -W lcec_conf ethercat-conf.xml
+loadrt lcec
+
+# --- Load Realtime Components ---
+# Trivkins for simple 1-axis testing
+loadrt trivkins coordinates=Z
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+
+# Scaling and Conversion
+loadrt scale count=2
+loadrt conv_float_s32 count=1
+loadrt conv_s32_float count=1
+
+# --- Add Functions to Servo Thread ---
+addf lcec.read-all servo-thread
+
+addf conv-s32-float.0 servo-thread
+addf scale.0 servo-thread
+addf scale.1 servo-thread
+addf conv-float-s32.0 servo-thread
+
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+
+addf lcec.write-all servo-thread
+
+# --- CiA402 State Machine for J2 ---
+# Using the specialized script that only initializes Slave 2
+loadusr -W ./cia402_j2.py
+
+# ============================================================
+# JOINT 0 (Z-Axis in this test config) -> SLAVE 2 (SV670N)
+# ============================================================
+
+# Enable Loop
+net j0-enable     joint.0.amp-enable-out => cia402_j2.enable
+# net j0-amp-fault  cia402_j2.statusword => joint.0.amp-fault-in # INVALID: Type mismatch (u32 -> bit)
+net j0-reset      iocontrol.0.user-request-enable => cia402_j2.reset
+
+# Feedback Chain: lcec(s32) -> conv -> scale -> joint
+# Slave 2 actual-position
+net z-pos-fb-raw lcec.0.2.actual-position => conv-s32-float.0.in
+net z-pos-fb-f   conv-s32-float.0.out => scale.0.in
+setp scale.0.gain 0.0006 
+# (1 / 1666.666) matching original config
+net z-pos-fb     scale.0.out => joint.0.motor-pos-fb
+
+# Command Chain: joint -> scale -> conv -> lcec(s32)
+net z-pos-cmd    joint.0.motor-pos-cmd => scale.1.in
+setp scale.1.gain 1666.666
+net z-pos-cmd-s  scale.1.out => conv-float-s32.0.in
+net z-pos-cmd-raw conv-float-s32.0.out => lcec.0.2.target-position
+
+# Connect CiA402 to lcec
+net status-word2  lcec.0.2.cia-statusword => cia402_j2.statusword
+net control-word2 cia402_j2.controlword => lcec.0.2.cia-controlword
+
+# --- E-Stop Loopback ---
+net estop-loop iocontrol.0.user-enable-out => iocontrol.0.emc-enable-in
+
+# --- Manual Tool Change (Required for Axis) ---
+loadusr -W hal_manualtoolchange
+net tool-change iocontrol.0.tool-change => hal_manualtoolchange.change
+net tool-changed iocontrol.0.tool-changed <= hal_manualtoolchange.changed
+net tool-number iocontrol.0.tool-prep-number => hal_manualtoolchange.number

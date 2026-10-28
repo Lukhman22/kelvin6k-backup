@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pyvcp>
+  <!-- Title -->
+  <label>
+    <text>"MACHINE DASHBOARD"</text>
+    <font>("Helvetica", 16, "bold")</font>
+    <relief>RAISED</relief>
+    <padx>10</padx>
+    <pady>10</pady>
+  </label>
+
+  <!-- Emergency Axis Override Controls -->
+  <labelframe text="⚠️ EMERGENCY AXIS OVERRIDE ⚠️">
+    <label>
+      <text>"Uncheck to DISABLE motor (for emergency manual movement)"</text>
+      <font>("Helvetica", 9, "italic")</font>
+    </label>
+    <hbox>
+      <label><text>"J0 (Angle):  "</text></label>
+      <checkbutton>
+        <halpin>"j0-override"</halpin>
+        <initval>1</initval>
+      </checkbutton>
+      <led>
+        <halpin>"j0-enable-status"</halpin>
+        <size>12</size>
+        <on_color>"lime"</on_color>
+        <off_color>"gray"</off_color>
+      </led>
+      
+      <label><text>"   J1 (Radius): "</text></label>
+      <checkbutton>
+        <halpin>"j1-override"</halpin>
+        <initval>1</initval>
+      </checkbutton>
+      <led>
+        <halpin>"j1-enable-status"</halpin>
+        <size>12</size>
+        <on_color>"lime"</on_color>
+        <off_color>"gray"</off_color>
+      </led>
+      
+      <label><text>"   J2 (Height): "</text></label>
+      <checkbutton>
+        <halpin>"j2-override"</halpin>
+        <initval>1</initval>
+      </checkbutton>
+      <led>
+        <halpin>"j2-enable-status"</halpin>
+        <size>12</size>
+        <on_color>"lime"</on_color>
+        <off_color>"gray"</off_color>
+      </led>
+    </hbox>
+  </labelframe>
+
+  <!-- Homing in normal mode is automatic on machine-on (F2). No buttons here. -->
+  <!-- Run 'bash start_linuxcnc.sh calibrate' to re-seed the encoder reference. -->
+
+  <!-- Last Saved Position + G-code progress counter -->
+  <labelframe text="📍 Last Saved Position / G-code Counter">
+    <label>
+      <text>"Live position + last running G-code file/line (informational only)."</text>
+      <font>("Helvetica", 9, "italic")</font>
+    </label>
+    <hbox>
+      <label><text>"J0: "</text></label>
+      <number>
+        <halpin>"last-home-j0"</halpin>
+        <format>"4.2f"</format>
+      </number>
+      <label><text>"°   "</text></label>
+      <label><text>"J1: "</text></label>
+      <number>
+        <halpin>"last-home-j1"</halpin>
+        <format>"4.2f"</format>
+      </number>
+      <label><text>"mm   "</text></label>
+      <label><text>"J2: "</text></label>
+      <number>
+        <halpin>"last-home-j2"</halpin>
+        <format>"4.2f"</format>
+      </number>
+      <label><text>"mm"</text></label>
+    </hbox>
+    <hbox>
+      <label><text>"G-code Line: "</text></label>
+      <number>
+        <halpin>"gcode-line"</halpin>
+        <format>"7.0f"</format>
+      </number>
+    </hbox>
+  </labelframe>
+
+  <!-- Limit Switches Section -->
+  <labelframe text="Limit Switch Status">
+    <hbox>
+      <label><text>"J0 (Ang): "</text></label>
+      <led>
+        <halpin>"j0-min"</halpin>
+        <size>15</size>
+        <on_color>"red"</on_color>
+        <off_color>"green"</off_color>
+      </led>
+      <led>
+        <halpin>"j0-max"</halpin>
+        <size>15</size>
+        <on_color>"red"</on_color>
+        <off_color>"green"</off_color>
+      </led>
+      <label><text>" J1 (Rad): "</text></label>
+      <led>
+        <halpin>"j1-min"</halpin>
+        <size>15</size>
+        <on_color>"red"</on_color>
+        <off_color>"green"</off_color>
+      </led>
+      <led>
+        <halpin>"j1-max"</halpin>
+        <size>15</size>
+        <on_color>"red"</on_color>
+        <off_color>"green"</off_color>
+      </led>
+    </hbox>
+    <hbox>
+      <label><text>"J2 (Hgt): "</text></label>
+      <led>
+        <halpin>"j2-min"</halpin>
+        <size>15</size>
+        <on_color>"red"</on_color>
+        <off_color>"green"</off_color>
+      </led>
+      <led>
+        <halpin>"j2-max"</halpin>
+        <size>15</size>
+        <on_color>"red"</on_color>
+        <off_color>"green"</off_color>
+      </led>
+    </hbox>
+  </labelframe>
+
+  <!-- Feed & Speed Overrides -->
+  <labelframe text="Feed Override">
+    <hbox>
+        <number>
+            <halpin>"feed-override-num"</halpin>
+            <format>"3.0f"</format>
+        </number>
+        <label><text>"%"</text></label>
+    </hbox>
+    <bar>
+        <halpin>"feed-bar"</halpin>
+        <min_>0</min_>
+        <max_>200</max_>
+    </bar>
+  </labelframe>
+
+  <!-- Machine Status -->
+  <labelframe text="Machine Status">
+    <hbox>
+        <label><text>"Program: "</text></label>
+        <led>
+            <halpin>"is-running"</halpin>
+            <size>15</size>
+            <on_color>"green"</on_color>
+            <off_color>"black"</off_color>
+        </led>
+        <label><text>" Running"</text></label>
+    </hbox>
+    <hbox>
+        <label><text>"E-Stop:   "</text></label>
+        <led>
+            <halpin>"estop-led"</halpin>
+            <size>15</size>
+            <on_color>"green"</on_color>
+            <off_color>"red"</off_color>
+        </led>
+    </hbox>
+  </labelframe>
+
+  <!-- Coordinates Display -->
+  <labelframe text="Tool Position">
+    <hbox>
+        <label><text>"X: "</text></label>
+        <number><halpin>"pos-x"</halpin><format>"4.1f"</format></number>
+    </hbox>
+    <hbox>
+        <label><text>"Y: "</text></label>
+        <number><halpin>"pos-y"</halpin><format>"4.1f"</format></number>
+    </hbox>
+    <hbox>
+        <label><text>"Z: "</text></label>
+        <number><halpin>"pos-z"</halpin><format>"4.1f"</format></number>
+    </hbox>
+  </labelframe>
+
+  <!-- Auxiliary Motor Control (bypasses M67/M68 — works during printing) -->
+  <labelframe text="🔧 Auxiliary Motor Control">
+    <label>
+      <text>"ON/OFF + Speed % — works in ALL states"</text>
+      <font>("Helvetica", 9, "italic")</font>
+    </label>
+
+    <!-- Extruder -->
+    <hbox>
+      <label><text>"Extruder:  "</text></label>
+      <checkbutton>
+        <halpin>"aux-ext-on"</halpin>
+        <initval>0</initval>
+      </checkbutton>
+      <led>
+        <halpin>"aux-ext-led"</halpin>
+        <size>12</size>
+        <on_color>"lime"</on_color>
+        <off_color>"red"</off_color>
+      </led>
+      <scale>
+        <halpin>"aux-ext-speed"</halpin>
+        <resolution>1</resolution>
+        <orient>HORIZONTAL</orient>
+        <min_>0</min_>
+        <max_>100</max_>
+        <initval>0</initval>
+      </scale>
+      <number>
+        <halpin>"aux-ext-display"</halpin>
+        <format>"3.0f"</format>
+      </number>
+      <label><text>"%"</text></label>
+    </hbox>
+
+    <!-- Pump -->
+    <hbox>
+      <label><text>"Pump:      "</text></label>
+      <checkbutton>
+        <halpin>"aux-pump-on"</halpin>
+        <initval>0</initval>
+      </checkbutton>
+      <led>
+        <halpin>"aux-pump-led"</halpin>
+        <size>12</size>
+        <on_color>"lime"</on_color>
+        <off_color>"red"</off_color>
+      </led>
+      <scale>
+        <halpin>"aux-pump-speed"</halpin>
+        <resolution>1</resolution>
+        <orient>HORIZONTAL</orient>
+        <min_>0</min_>
+        <max_>100</max_>
+        <initval>0</initval>
+      </scale>
+      <number>
+        <halpin>"aux-pump-display"</halpin>
+        <format>"3.0f"</format>
+      </number>
+      <label><text>"%"</text></label>
+    </hbox>
+
+    <!-- Fluid Pump -->
+    <hbox>
+      <label><text>"Fluid Pump:"</text></label>
+      <checkbutton>
+        <halpin>"aux-fluid-on"</halpin>
+        <initval>0</initval>
+      </checkbutton>
+      <led>
+        <halpin>"aux-fluid-led"</halpin>
+        <size>12</size>
+        <on_color>"lime"</on_color>
+        <off_color>"red"</off_color>
+      </led>
+      <scale>
+        <halpin>"aux-fluid-speed"</halpin>
+        <resolution>1</resolution>
+        <orient>HORIZONTAL</orient>
+        <min_>0</min_>
+        <max_>100</max_>
+        <initval>0</initval>
+      </scale>
+      <number>
+        <halpin>"aux-fluid-display"</halpin>
+        <format>"3.0f"</format>
+      </number>
+      <label><text>"%"</text></label>
+    </hbox>
+  </labelframe>
+</pyvcp>

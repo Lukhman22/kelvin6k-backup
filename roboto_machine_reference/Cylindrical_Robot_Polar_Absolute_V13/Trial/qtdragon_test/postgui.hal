@@ -1,0 +1,49 @@
+# ============================================================
+# POST-GUI HAL — QtDragon Phase 0/1 validation build
+# All pyvcp.* references stripped. Custom panel will be ported
+# to QtVCP (.ui) in Phase 2; until then, override checkboxes
+# and aux-motor panel inputs are replaced with safe setp defaults.
+# ============================================================
+
+# --- Feed Override scaling (kept; bar display dropped) ---
+setp mult2.0.in1 100.0
+net feed-override halui.feed-override.value => mult2.0.in0
+# (was: mult2.0.out => pyvcp.feed-bar — dropped, QtDragon has its own feed DRO)
+
+# --- Auto-Home on Machine-On (unchanged, critical for abs-encoder workflow) ---
+net machine-is-on  halui.machine.is-on   => abs-home.machine-on
+net auto-home-pulse abs-home.trigger-home => halui.home-all
+
+# --- Emergency Axis Overrides — TEMPORARILY FORCED ON ---
+# Phase 2 will replace these with HALCheckBox wiring from the QtVCP panel.
+# Forcing in1=1 preserves the AND-gate safety: joint.N.amp-enable-out
+# still gates cia402.enableN through and2.N.
+setp and2.0.in1 1   # j0 override (was pyvcp.j0-override)
+setp and2.1.in1 1   # j1 override (was pyvcp.j1-override)
+setp and2.2.in1 1   # j2 override (was pyvcp.j2-override)
+
+# --- Aux motor master + per-motor enable (forced OFF for validation) ---
+# G-code M64 P4 still toggles motion.digital-out-04 => and2.{3,4,5}.in1.
+# Per-motor "panel checkbox" inputs go to in0; without a panel, set to 0
+# so aux motors stay off regardless of M64 state. Sliders default to 0
+# via setp on the scale inputs.
+net aux-gcode-enable motion.digital-out-04 => and2.3.in1 and2.4.in1 and2.5.in1
+
+setp and2.3.in0 0   # extruder panel-enable (was pyvcp.aux-ext-on)
+setp and2.4.in0 0   # pump panel-enable     (was pyvcp.aux-pump-on)
+setp and2.5.in0 0   # fluid panel-enable    (was pyvcp.aux-fluid-on)
+
+setp scale.6.in 0   # extruder speed slider (was pyvcp.aux-ext-speed-f)
+setp scale.7.in 0   # pump speed slider     (was pyvcp.aux-pump-speed-f)
+setp scale.8.in 0   # fluid speed slider    (was pyvcp.aux-fluid-speed-f)
+
+net aux-ext-scaled   scale.6.out  => mux2.3.in1
+net aux-ext-on       and2.3.out   => mux2.3.sel
+net aux-pump-scaled  scale.7.out  => mux2.4.in1
+net aux-pump-on      and2.4.out   => mux2.4.sel
+net aux-fluid-scaled scale.8.out  => mux2.5.in1
+net aux-fluid-on     and2.5.out   => mux2.5.sel
+
+# --- Position-saver signals ---
+# pyvcp number widgets were the only consumers; pos-saver output pins
+# remain readable via halcmd / halmeter during Phase 1 validation.
